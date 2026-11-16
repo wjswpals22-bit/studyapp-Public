@@ -126,6 +126,16 @@ function ringSvg(size, r, sw, pct, color, track) {
     (p > 0 ? `<circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C * p} ${C}"/>` : '') + '</svg>';
 }
 
+// ---------- 스터디룸 테마 (상점에서 적용) ----------
+const THEMES = [
+  { k: 'lofi', n: '로파이 밤 공부방', d: '비 오는 밤, 헤드폰 낀 고양이', bg: '#16152A', light: false },
+  { k: 'cherry', n: '벚꽃 봄 공부방', d: '벚꽃 날리는 봄날의 토끼', bg: '#F3E4E2', light: true },
+  { k: 'forest', n: '숲속 오두막', d: '반딧불이 숲과 안경 쓴 곰', bg: '#3E2C22', light: false },
+  { k: 'sea', n: '바닷가 공부방', d: '햇살 좋은 바다와 수달', bg: '#E4EFF1', light: true },
+  { k: 'snow', n: '눈 오는 밤', d: '눈 덮인 마을과 펭귄', bg: '#1B2438', light: false }
+];
+const curTheme = () => THEMES.find(t => t.k === D.roomTheme) || THEMES[0];
+
 // ---------- 라우팅 ----------
 const R = { tab: 'home', day: null, calY: new Date().getFullYear(), calM: new Date().getMonth() };
 const $ = s => document.querySelector(s);
@@ -134,10 +144,11 @@ function go(tab) { R.tab = tab; R.day = null; render(); }
 function openDay(k) { R.tab = 'planner'; R.day = k; const d = kdate(k); R.calY = d.getFullYear(); R.calM = d.getMonth(); render(); }
 function render() {
   $('#tab').innerHTML = TABS.map(([k, n, p]) => `<div class="tb tap${R.tab === k ? ' on' : ''}" data-tab="${k}"><svg viewBox="0 0 24 24">${p}</svg>${n}</div>`).join('');
-  const dark = R.tab === 'room';
-  native('setStatusBar', dark ? '#16152A' : '#F2F4F6', !dark);
-  document.querySelector('meta[name=theme-color]').content = dark ? '#16152A' : '#F2F4F6';
+  const dark = R.tab === 'room', th = curTheme();
+  native('setStatusBar', dark ? th.bg : '#F2F4F6', dark ? th.light : true);
+  document.querySelector('meta[name=theme-color]').content = dark ? th.bg : '#F2F4F6';
   $('#app').classList.toggle('dk', dark);
+  $('#app').className = $('#app').className.replace(/\brt-\w+/g, '').trim() + ' rt-' + th.k;
   if (R.tab === 'home') renderHome();
   else if (R.tab === 'planner') R.day ? renderDay() : renderCal();
   else if (R.tab === 'room') renderRoom();
@@ -189,7 +200,7 @@ function renderHome() {
       ${ctaHtml}
       <div class="foot"><div>연속 공부<b>${streak()}일째</b></div><div>이번 주<b class="num">${kdur(weekSec() / 60)}</b></div><div>어제보다<b>${diffMin >= 0 ? '+' : '-'}${kdur(Math.abs(diffMin))}${diffMin > 0 ? '<em>▲</em>' : diffMin < 0 ? '<em class="dn">▼</em>' : ''}</b></div></div>
     </div>
-    <div class="hc banner tap" data-act="room"><span class="live">로파이 밤 공부방</span><span class="go">스터디룸 이동하기<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></div>
+    <div class="hc banner tap" data-act="room"><span class="live">${curTheme().n}</span><span class="go">스터디룸 이동하기<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></div>
     <div class="sec"><b>오늘의 할 일<small class="num">${L.length ? `${doneN}/${L.length}` : ''}</small></b><span class="tap" data-act="today">플래너</span></div>
     <div class="hc slist${L.length ? '' : ' blank tap'}"${L.length ? '' : ' data-act="today"'}>${L.length ? '' : '<div class="bmsg">할 일을 추가해보세요<span>누르면 플래너로 이동해요</span></div>'}${L.map(({ s, t }) => {
       if (t.kind === 'time') {
@@ -315,8 +326,18 @@ function tickRoom() {
 // =========================================================
 //  상점 / 커뮤니티 (디자인 확정 전 — 준비 중)
 // =========================================================
+function renderShop() {
+  const cur = curTheme().k;
+  screen.innerHTML = `<div class="scroll soon shop"><div class="wrap">
+    <div class="head" style="padding:0 4px"><span class="tt">상점</span><div class="av tap" data-act="profile">${AV}</div></div>
+    <div class="sec"><b>스터디룸 테마</b><span style="padding-left:0">적용하면 홈 배너와 스터디룸이 바뀌어요</span></div>
+    ${THEMES.map(t => `<div class="thc${t.k === cur ? ' on' : ''}"><div class="thimg" style="background-image:url(img/${t.k === 'lofi' ? 'v2' : t.k}_wide.jpg)"></div>
+      <div class="thb"><div><b>${t.n}</b><span>${t.d}</span></div>${t.k === cur ? '<em>적용 중</em>' : `<button class="tap" data-theme="${t.k}">적용하기</button>`}</div></div>`).join('')}
+  </div></div>`;
+}
 function renderSoon() {
   const shop = R.tab === 'shop';
+  if (shop) return renderShop();
   const icon = shop ? TABS[3][2] : TABS[4][2];
   screen.innerHTML = `<div class="scroll soon"><div class="wrap">
     <div class="head" style="padding:0 4px"><span class="tt">${shop ? '상점' : '커뮤니티'}</span><div class="av tap" data-act="profile">${AV}</div></div>
@@ -329,6 +350,8 @@ function renderSoon() {
 // =========================================================
 function toggleTodo(tid) { const f = findTodo(tid); if (!f) return; f.t.done = !f.t.done; save(); }
 screen.addEventListener('click', e => {
+  const tb = e.target.closest('[data-theme]');
+  if (tb) { D.roomTheme = tb.dataset.theme; save(); render(); toast(curTheme().n + ' 테마를 적용했어요'); return; }
   const el = e.target.closest('[data-act],[data-day],[data-mon],[data-play],[data-ck],[data-hck],[data-edit],[data-addtodo],[data-pick],[data-cta]');
   if (!el) return;
   const ds = el.dataset;
@@ -568,7 +591,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.5</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.6</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
