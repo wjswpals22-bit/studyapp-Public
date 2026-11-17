@@ -133,7 +133,7 @@ const THEMES = [
   { k: 'forest', n: '숲속 오두막', d: '반딧불이 숲과 안경 쓴 곰', bg: '#3E2C22', light: false },
   { k: 'sea', n: '바닷가 공부방', d: '햇살 좋은 바다와 수달', bg: '#E4EFF1', light: true },
   { k: 'snow', n: '눈 오는 밤', d: '눈 덮인 마을과 펭귄', bg: '#1B2438', light: false },
-  { k: 'train', n: '공부 기차여행', d: '창밖 풍경을 따라 달리는 공부열차', bg: '#22434A', light: false, isNew: 1 },
+  { k: 'train', n: '공부 기차여행', d: '반짝이는 바다 옆을 달리는 공부열차', bg: '#F4EFE7', light: true, isNew: 1 },
   { k: 'orb', n: '집중 오브', d: '공부할수록 커지는 빛, 군더더기 없는 집중', bg: '#EEE8DE', light: true, isNew: 1 }
 ];
 const curTheme = () => THEMES.find(t => t.k === D.roomTheme) || THEMES[0];
@@ -301,11 +301,11 @@ snow:{grain:1,c:['#F08A8A','#8DB4F0','#8FD0B4','#EFCB76'],kick:'SNOWY NIGHT · �
 };
 
 
-TM.train = {kick: 'STUDY EXPRESS · 공부열차', c: [],
- v: {'--bbg':'linear-gradient(180deg,#FCF8EF,#F6EEDF)','--hbg':'#2E5E62','--tx':'#203B3E','--mu':'#9A8F7C','--ln':'#EDE5D5','--tg':'#F1E9D8','--tt':'#3A4E4F','--sun':'#C9735A','--sat':'#2E7C84','--kick':'#F2C14E','--mtx':'#FFFFFF','--abg':'rgba(255,255,255,.2)','--aic':'#fff','--tdbg':'#F2C14E','--tdtx':'#203B3E','--tdsh':'0 0 0 3px rgba(242,193,78,.28)','--acc':'#F2C14E','--hmu':'rgba(255,255,255,.7)','--wtx':'#fff','--gbg':'#FBF6EC','--gtx':'#203B3E','--gmu':'#9A8F7C','--gnum':'#2E5E62','--gsh':'0 6px 14px -8px rgba(0,0,0,.4)','--ddbg':'#2E5E62','--ddtx':'#F2C14E','--ckb':'#D8CDB8','--ckbg':'#fff','--btx':'#fff','--bbtn':'#2E5E62','--bsh':'0 6px 14px -6px rgba(46,94,98,.6)','--tln':'#E6DCC8','--tln2':'#F1EADB','--tgbg':'#fff','--sh':'0 12px 26px -16px rgba(32,59,62,.5)'},
- band: (h) => `<defs><linearGradient id="trb" x1="0" y1="0" x2="0" y2="1"><stop offset=".25" stop-color="#14282A" stop-opacity="0"/><stop offset="1" stop-color="#14282A" stop-opacity=".72"/></linearGradient></defs><image href="img/train_wide.jpg" x="0" y="0" width="${W}" height="${h || 88}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${h || 88}" fill="url(#trb)"/>`,
- body: (h) => { let s = `<g opacity=".16"><path d="M0 ${h - 16}H${W}M0 ${h - 8}H${W}" stroke="#2E5E62" stroke-width="1.6"/>`; for (let x = 4; x < W; x += 14) s += `<rect x="${x}" y="${h - 19}" width="5" height="14" rx="1" fill="#7D5A3C"/>`; return s + '</g>'; },
- hero: (h) => `<defs><linearGradient id="trh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E4448" stop-opacity=".3"/><stop offset=".55" stop-color="#1E4448" stop-opacity=".62"/><stop offset="1" stop-color="#1E4448" stop-opacity=".85"/></linearGradient></defs><image href="img/train_wide.jpg" x="0" y="0" width="${W}" height="${h}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${h}" fill="url(#trh)"/>`,
+TM.train = {kick: 'STUDY EXPRESS · 바다 노선', c: [],
+ v: {'--bbg':'linear-gradient(180deg,#FFFDF9,#F7F2EA)','--hbg':'#EAF2F6','--tx':'#2A3B4A','--mu':'#93A0AC','--ln':'#EEE8DE','--tg':'#EEF4F8','--tt':'#2F4A5E','--sun':'#D97E6A','--sat':'#3E7FA8','--kick':'#3E7FA8','--mtx':'#2A3B4A','--abg':'rgba(255,255,255,.82)','--ash':'0 2px 6px -2px rgba(42,59,74,.25)','--aic':'#2A3B4A','--tdbg':'#3E7FA8','--tdtx':'#fff','--tdsh':'0 0 0 3px rgba(91,155,196,.25)','--acc':'#3E7FA8','--hmu':'#5E6E7C','--wtx':'#2A3B4A','--gbg':'rgba(255,255,255,.9)','--gtx':'#2A3B4A','--gmu':'#93A0AC','--gnum':'#3E7FA8','--gsh':'0 6px 14px -8px rgba(42,59,74,.3)','--ddbg':'#E3EEF5','--ddtx':'#2F6E96','--ckb':'#CBD3DB','--ckbg':'#fff','--btx':'#fff','--bbtn':'#3E7FA8','--bsh':'0 6px 14px -6px rgba(62,127,168,.55)','--tln':'#ECE6DC','--tln2':'#F5F1EA','--tgbg':'#fff','--sh':'0 12px 26px -18px rgba(42,59,74,.35)'},
+ band: (h) => { h = h || 88; return `<defs><linearGradient id="trb" x1="0" y1="0" x2="0" y2="1"><stop offset=".3" stop-color="#FFFDF9" stop-opacity="0"/><stop offset="1" stop-color="#FFFDF9" stop-opacity=".92"/></linearGradient></defs><image href="img/train_wide.jpg" x="0" y="0" width="${W}" height="${h}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${h}" fill="url(#trb)"/>`; },
+ body: (h) => { let s = '<g fill="none" stroke="#5B9BC4" stroke-width="1.2" opacity=".14">'; for (let k = 0; k < 3; k++) { let d = `M0 ${h - 34 + k * 9}`; for (let x = 0; x < W; x += 40) d += ` q10 -5 20 0 t20 0`; s += `<path d="${d}"/>`; } return s + '</g>'; },
+ hero: (h) => `<defs><linearGradient id="trh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFDF9" stop-opacity=".45"/><stop offset=".6" stop-color="#FFFDF9" stop-opacity=".7"/><stop offset="1" stop-color="#FFFDF9" stop-opacity=".85"/></linearGradient></defs><image href="img/train_wide.jpg" x="0" y="0" width="${W}" height="${h}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${h}" fill="url(#trh)"/>`,
  hpt: '14px'};
 TM.orb = {grain: 1, kick: 'DEEP FOCUS', c: [],
  v: {'--bbg':'#F4EFE7','--hbg':'#EEE8DE','--tx':'#1B1A19','--mu':'#8C8378','--ln':'rgba(27,26,25,.07)','--tg':'rgba(27,26,25,.05)','--tt':'#3E3A35','--sun':'#E07A5F','--sat':'#7C6FB8','--kick':'#8C8378','--mtx':'#1B1A19','--abg':'rgba(27,26,25,.06)','--aic':'#1B1A19','--tdbg':'radial-gradient(circle at 40% 38%,#FFE6B8,#F7B37A 45%,#EE8B78)','--tdtx':'#1B1A19','--tdsh':'0 0 12px rgba(238,139,120,.65)','--acc':'#E98A6E','--hmu':'#8C8378','--gbg':'rgba(255,255,255,.72)','--gtx':'#1B1A19','--gmu':'#8C8378','--gnum':'#1B1A19','--gsh':'inset 0 0 0 1px rgba(27,26,25,.06)','--ddbg':'#1B1A19','--ddtx':'#fff','--ckb':'rgba(27,26,25,.25)','--btx':'#fff','--bbtn':'#1B1A19','--bsh':'0 6px 14px -6px rgba(27,26,25,.45)','--tln':'rgba(27,26,25,.09)','--tln2':'rgba(27,26,25,.04)','--sh':'0 12px 26px -18px rgba(27,26,25,.35)','--grain':'.12'},
@@ -684,7 +684,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.11</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.12</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
