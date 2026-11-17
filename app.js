@@ -488,8 +488,8 @@ function sheetTodo(tid, preSid, draft) {
   let st = edit && edit.kind === 'time' ? toMin(edit.st) : Math.min(lastEnd, 1380), en = edit && edit.kind === 'time' ? toMin(edit.en) : Math.min(st + 60, 1430);
   let field = 'en';
   const w = openSheet(`${title(edit ? '할 일 수정' : '할 일 추가')}<div style="height:12px"></div>
-    <div class="lb">할 일</div><div class="form" style="padding:0;background:none;margin-bottom:18px"><div class="f"><input id="ptd" maxlength="40" placeholder="예) 미적분 p.112~128" value="${esc(text)}"></div></div>
     <div class="lb lbx">테마<span class="tap" id="pedit">편집</span></div><div class="chips" id="pch"></div>
+    <div class="lb">할 일</div><div class="form" style="padding:0;background:none;margin-bottom:18px"><div class="f"><input id="ptd" maxlength="40" placeholder="예) 미적분 p.112~128" value="${esc(text)}"></div></div>
     <div class="lb">종류</div><div class="seg" id="pkind"><span class="tap" data-k="time">시간 정해서 공부</span><span class="tap" data-k="check">체크만 하기</span></div>
     <div id="ptime">
       <div class="lb">공부할 시간</div>
@@ -668,7 +668,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.9</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.10</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
