@@ -432,7 +432,7 @@ function sheetTodo(tid, preSid, draft) {
   let field = 'en';
   const w = openSheet(`${title(edit ? '할 일 수정' : '할 일 추가')}<div style="height:12px"></div>
     <div class="lb">할 일</div><div class="form" style="padding:0;background:none;margin-bottom:18px"><div class="f"><input id="ptd" maxlength="40" placeholder="예) 미적분 p.112~128" value="${esc(text)}"></div></div>
-    <div class="lb">테마</div><div class="chips" id="pch"></div>
+    <div class="lb lbx">테마<span class="tap" id="pedit">편집</span></div><div class="chips" id="pch"></div>
     <div class="lb">종류</div><div class="seg" id="pkind"><span class="tap" data-k="time">시간 정해서 공부</span><span class="tap" data-k="check">체크만 하기</span></div>
     <div id="ptime">
       <div class="lb">공부할 시간</div>
@@ -443,10 +443,27 @@ function sheetTodo(tid, preSid, draft) {
     <div class="dur" id="pchk" style="margin:-4px 0 18px">홈 화면에 체크칸으로 떠요</div>
     <div class="btns">${edit ? '<div class="btn red tap" id="pdel">삭제</div>' : ''}<div class="btn tap" id="pok">${edit ? '저장' : '추가하기'}</div></div>`);
   const ptd = w.querySelector('#ptd');
-  const chips = () => { w.querySelector('#pch').innerHTML = D.subjects.map(s => `<div class="c tap${s.id === sel ? ' on' : ''}" data-s="${s.id}" style="--c:${s.c};--l:${s.l}"><i></i>${esc(s.name)}</div>`).join('') + '<div class="c new tap" data-s="__new">+ 새 테마</div>'; };
+  let editing = false, armed = null;
+  const chips = () => {
+    w.querySelector('#pedit').textContent = editing ? '완료' : '편집';
+    w.querySelector('#pch').innerHTML = editing
+      ? (D.subjects.map(s => `<div class="c tap cdel${armed === s.id ? ' arm' : ''}" data-s="${s.id}" style="--c:${s.c};--l:${s.l}"><i></i>${armed === s.id ? '삭제할까요?' : esc(s.name)}<b>×</b></div>`).join('') || '<div class="dur" style="margin:0">테마가 없어요</div>')
+      : D.subjects.map(s => `<div class="c tap${s.id === sel ? ' on' : ''}" data-s="${s.id}" style="--c:${s.c};--l:${s.l}"><i></i>${esc(s.name)}</div>`).join('') + '<div class="c new tap" data-s="__new">+ 새 테마</div>';
+  };
   chips();
+  w.querySelector('#pedit').onclick = () => { editing = !editing; armed = null; chips(); };
   w.querySelector('#pch').onclick = e => {
     const c = e.target.closest('[data-s]'); if (!c) return;
+    if (editing) {
+      const id = c.dataset.s;
+      if (armed !== id) { armed = id; chips(); toast('한 번 더 누르면 삭제돼요. 이 테마의 할 일도 함께 지워져요'); return; }
+      if (D.running && D.running.sid === id) stopTimer(true);
+      D.subjects = D.subjects.filter(x => x.id !== id);
+      for (const k in D.plans) D.plans[k] = D.plans[k].filter(p => p.sid !== id);
+      if (sel === id) sel = (D.subjects[0] || {}).id || null;
+      armed = null; save(); chips(); upd(); render(); toast('테마를 삭제했어요');
+      return;
+    }
     if (c.dataset.s === '__new') { const dr = { text: ptd.value.trim(), kind }; sheetSubjectEdit(null, ns => { const back = R.day; sheetTodo(null, ns, dr); }); return; }
     sel = c.dataset.s; chips(); upd();
   };
@@ -591,7 +608,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.6</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.7</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
