@@ -132,7 +132,9 @@ const THEMES = [
   { k: 'cherry', n: '벚꽃 봄 공부방', d: '벚꽃 날리는 봄날의 토끼', bg: '#F3E4E2', light: true },
   { k: 'forest', n: '숲속 오두막', d: '반딧불이 숲과 안경 쓴 곰', bg: '#3E2C22', light: false },
   { k: 'sea', n: '바닷가 공부방', d: '햇살 좋은 바다와 수달', bg: '#E4EFF1', light: true },
-  { k: 'snow', n: '눈 오는 밤', d: '눈 덮인 마을과 펭귄', bg: '#1B2438', light: false }
+  { k: 'snow', n: '눈 오는 밤', d: '눈 덮인 마을과 펭귄', bg: '#1B2438', light: false },
+  { k: 'train', n: '공부 기차여행', d: '창밖 풍경을 따라 달리는 공부열차', bg: '#22434A', light: false, isNew: 1 },
+  { k: 'orb', n: '집중 오브', d: '공부할수록 커지는 빛, 군더더기 없는 집중', bg: '#EEE8DE', light: true, isNew: 1 }
 ];
 const curTheme = () => THEMES.find(t => t.k === D.roomTheme) || THEMES[0];
 
@@ -298,6 +300,20 @@ snow:{grain:1,c:['#F08A8A','#8DB4F0','#8FD0B4','#EFCB76'],kick:'SNOWY NIGHT · �
  hpt:'32px'}
 };
 
+
+TM.train = {kick: 'STUDY EXPRESS · 공부열차', c: [],
+ v: {'--bbg':'linear-gradient(180deg,#FCF8EF,#F6EEDF)','--hbg':'#2E5E62','--tx':'#203B3E','--mu':'#9A8F7C','--ln':'#EDE5D5','--tg':'#F1E9D8','--tt':'#3A4E4F','--sun':'#C9735A','--sat':'#2E7C84','--kick':'#F2C14E','--mtx':'#FFFFFF','--abg':'rgba(255,255,255,.2)','--aic':'#fff','--tdbg':'#F2C14E','--tdtx':'#203B3E','--tdsh':'0 0 0 3px rgba(242,193,78,.28)','--acc':'#F2C14E','--hmu':'rgba(255,255,255,.7)','--wtx':'#fff','--gbg':'#FBF6EC','--gtx':'#203B3E','--gmu':'#9A8F7C','--gnum':'#2E5E62','--gsh':'0 6px 14px -8px rgba(0,0,0,.4)','--ddbg':'#2E5E62','--ddtx':'#F2C14E','--ckb':'#D8CDB8','--ckbg':'#fff','--btx':'#fff','--bbtn':'#2E5E62','--bsh':'0 6px 14px -6px rgba(46,94,98,.6)','--tln':'#E6DCC8','--tln2':'#F1EADB','--tgbg':'#fff','--sh':'0 12px 26px -16px rgba(32,59,62,.5)'},
+ band: (h) => `<defs><linearGradient id="trb" x1="0" y1="0" x2="0" y2="1"><stop offset=".25" stop-color="#14282A" stop-opacity="0"/><stop offset="1" stop-color="#14282A" stop-opacity=".72"/></linearGradient></defs><image href="img/train_wide.jpg" x="0" y="0" width="${W}" height="${h || 88}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${h || 88}" fill="url(#trb)"/>`,
+ body: (h) => { let s = `<g opacity=".16"><path d="M0 ${h - 16}H${W}M0 ${h - 8}H${W}" stroke="#2E5E62" stroke-width="1.6"/>`; for (let x = 4; x < W; x += 14) s += `<rect x="${x}" y="${h - 19}" width="5" height="14" rx="1" fill="#7D5A3C"/>`; return s + '</g>'; },
+ hero: (h) => `<defs><linearGradient id="trh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E4448" stop-opacity=".3"/><stop offset=".55" stop-color="#1E4448" stop-opacity=".62"/><stop offset="1" stop-color="#1E4448" stop-opacity=".85"/></linearGradient></defs><image href="img/train_wide.jpg" x="0" y="0" width="${W}" height="${h}" preserveAspectRatio="xMidYMid slice"/><rect width="${W}" height="${h}" fill="url(#trh)"/>`,
+ hpt: '14px'};
+TM.orb = {grain: 1, kick: 'DEEP FOCUS', c: [],
+ v: {'--bbg':'#F4EFE7','--hbg':'#EEE8DE','--tx':'#1B1A19','--mu':'#8C8378','--ln':'rgba(27,26,25,.07)','--tg':'rgba(27,26,25,.05)','--tt':'#3E3A35','--sun':'#E07A5F','--sat':'#7C6FB8','--kick':'#8C8378','--mtx':'#1B1A19','--abg':'rgba(27,26,25,.06)','--aic':'#1B1A19','--tdbg':'radial-gradient(circle at 40% 38%,#FFE6B8,#F7B37A 45%,#EE8B78)','--tdtx':'#1B1A19','--tdsh':'0 0 12px rgba(238,139,120,.65)','--acc':'#E98A6E','--hmu':'#8C8378','--gbg':'rgba(255,255,255,.72)','--gtx':'#1B1A19','--gmu':'#8C8378','--gnum':'#1B1A19','--gsh':'inset 0 0 0 1px rgba(27,26,25,.06)','--ddbg':'#1B1A19','--ddtx':'#fff','--ckb':'rgba(27,26,25,.25)','--btx':'#fff','--bbtn':'#1B1A19','--bsh':'0 6px 14px -6px rgba(27,26,25,.45)','--tln':'rgba(27,26,25,.09)','--tln2':'rgba(27,26,25,.04)','--sh':'0 12px 26px -18px rgba(27,26,25,.35)','--grain':'.12'},
+ band: (h) => { h = h || 88; return `<defs><radialGradient id="obA" cx=".42" cy=".4" r=".5"><stop offset="0" stop-color="#FFE6B8"/><stop offset=".45" stop-color="#F7B37A"/><stop offset=".8" stop-color="#EE8B78" stop-opacity=".6"/><stop offset="1" stop-color="#EE8B78" stop-opacity="0"/></radialGradient><filter id="obF" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter></defs><circle cx="${W - 70}" cy="${h * .45}" r="58" fill="none" stroke="rgba(27,26,25,.1)" stroke-dasharray="3 4"/><circle cx="${W - 70}" cy="${h * .45}" r="44" fill="url(#obA)" filter="url(#obF)"/><circle cx="${W - 58}" cy="${h * .55}" r="18" fill="#B9A6E8" opacity=".45" filter="url(#obF)"/>`; },
+ body: (h) => `<defs><radialGradient id="obB"><stop offset="0" stop-color="#F7B37A" stop-opacity=".22"/><stop offset="1" stop-color="#F7B37A" stop-opacity="0"/></radialGradient></defs><circle cx="40" cy="${h - 30}" r="120" fill="url(#obB)"/>`,
+ hero: (h) => `<defs><radialGradient id="obH" cx=".42" cy=".4" r=".5"><stop offset="0" stop-color="#FFE6B8"/><stop offset=".45" stop-color="#F7B37A"/><stop offset=".8" stop-color="#EE8B78" stop-opacity=".55"/><stop offset="1" stop-color="#EE8B78" stop-opacity="0"/></radialGradient><filter id="obG" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter></defs><circle cx="${W - 40}" cy="18" r="66" fill="url(#obH)" filter="url(#obG)" opacity=".85"/><circle cx="${W - 40}" cy="18" r="84" fill="none" stroke="rgba(27,26,25,.09)" stroke-dasharray="3 4"/>`,
+ hpt: '14px'};
+
 function plVars(el) { const th = TM[curTheme().k] || TM.lofi; for (const k in th.v) el.style.setProperty(k, th.v[k]); el.classList.toggle('plgrain', !!th.grain); return th; }
 const plSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${inner}</svg>`;
 function plDeco(el, fn, cls) { if (!el) return; const r = el.getBoundingClientRect(); W = Math.round(r.width) || 336; const h = Math.round(r.height) || 88; el.insertAdjacentHTML('afterbegin', plSvg(W, h, fn(h), cls || 'pbg')); }
@@ -389,7 +405,7 @@ function renderShop() {
     <div class="head" style="padding:0 4px"><span class="tt">상점</span><div class="av tap" data-act="profile">${AV}</div></div>
     <div class="sec"><b>스터디룸 테마</b><span style="padding-left:0">적용하면 홈 배너와 스터디룸이 바뀌어요</span></div>
     ${THEMES.map(t => `<div class="thc${t.k === cur ? ' on' : ''}"><div class="thimg" style="background-image:url(img/${t.k === 'lofi' ? 'v2' : t.k}_wide.jpg)"></div>
-      <div class="thb"><div><b>${t.n}</b><span>${t.d}</span></div>${t.k === cur ? '<em>적용 중</em>' : `<button class="tap" data-theme="${t.k}">적용하기</button>`}</div></div>`).join('')}
+      <div class="thb"><div><b>${t.n}${t.isNew ? '<u class="new">NEW</u>' : ''}</b><span>${t.d}</span></div>${t.k === cur ? '<em>적용 중</em>' : `<button class="tap" data-theme="${t.k}">적용하기</button>`}</div></div>`).join('')}
   </div></div>`;
 }
 function renderSoon() {
@@ -668,7 +684,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.10</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.11</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
