@@ -376,3 +376,70 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .cfr{display:flex;gap:8px;margin-top:20px}
 .cfr div{flex:1;height:46px;border-radius:12px;background:#F2F4F6;color:#4E5968;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .cfr .yes{background:#E5574A;color:#fff}
+/* ===== v0.1.9: 홈 시간 카드 안 오늘의 다짐 ===== */
+.cta.vowc .ct{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cta.vowc .ct span{display:block;font-size:10.5px;color:#8B95A1;font-weight:500;margin:0 0 1px}
+.cta.vowc .ct em{font-style:normal;color:#B0B8C1;font-weight:600}
+.cta.vowc .pb2 svg.ed{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* ===== v0.1.9: 플래너 테마 디자인 (스터디룸 테마를 따라감, 기본틀 제외) ===== */
+.pbg{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.plgrain .plc:after,.plgrain .phero:after,.plgrain .dmain:after{content:"";position:absolute;inset:0;z-index:9;pointer-events:none;border-radius:inherit;opacity:var(--grain,.14);mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* 달력 */
+.cal .card.plc{position:relative;overflow:hidden;isolation:isolate;padding:0;border-radius:22px;background:var(--bbg);color:var(--tx);box-shadow:var(--sh,none)}
+.plc .band{position:relative;height:88px;flex:none;background:var(--hbg);overflow:hidden}
+.plc .mon{position:absolute;left:0;right:0;bottom:12px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 14px 0 16px;z-index:2}
+.plc .mon small{display:block;font-size:9.5px;font-weight:700;letter-spacing:1.4px;color:var(--kick);margin-bottom:3px}
+.plc .mon b{font-size:19px;font-weight:700;color:var(--mtx);letter-spacing:-.5px}
+.plc .mon .ar i{background:var(--abg);box-shadow:var(--ash,none)}
+.plc .mon svg{stroke:var(--aic)}
+.plc .sign{position:relative;background:#F4E2BC;padding:7px 14px 6px;border-radius:6px;box-shadow:0 3px 0 #3E2A1B,inset 0 0 0 1.5px #C9A46A;transform:rotate(-2deg)}
+.plc .sign:before,.plc .sign:after{content:"";position:absolute;top:-30px;width:1.2px;height:30px;background:#2a2018}
+.plc .sign:before{left:18px}.plc .sign:after{right:18px}
+.plc .sign b{color:#4A3020;font-size:17px}
+.plc .pbody{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 6px 6px}
+.plc .wk,.plc .cgrid{position:relative;z-index:1}
+.plc .wk span{color:var(--mu);font-weight:600}
+.plc .wk span:first-child{color:var(--sun)}.plc .wk span:last-child{color:var(--sat)}
+.plc .cd{border-top-color:var(--ln);padding-top:5px}
+.plc .cd b{width:21px;height:21px;margin-bottom:4px;color:var(--tx);font-weight:650}
+.plc .cd.sun b{color:var(--sun)}.plc .cd.sat b{color:var(--sat)}
+.plc .cd.fut b,.plc .cd.sun.fut b,.plc .cd.sat.fut b{opacity:.75}
+.plc .cd.today b{background:var(--tdbg)!important;color:var(--tdtx)!important;box-shadow:var(--tdsh,none);opacity:1}
+.plc .ctg{display:flex;align-items:center;gap:3px;height:15px;line-height:15px;font-weight:550;padding:0 3px 0 4px;background:var(--tg);color:var(--tt);box-shadow:var(--tgsh,none);letter-spacing:-.45px}
+.plc .ctg i{width:4px;height:4px;border-radius:50%;flex:none}
+.plc .ctg.past{opacity:.55}
+.plc .ctg.ok{color:var(--tt);text-decoration:line-through;opacity:.5}
+.plc .more{color:var(--mu)}
+/* 기입 */
+.day .dh span{color:var(--ddtx);background:var(--ddbg);border-radius:999px;padding:4px 9px;box-shadow:var(--ddsh,none)}
+.day .card.phero{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:var(--hbg);color:var(--mtx);padding:var(--hpt,14px) 12px 12px;margin-bottom:8px;box-shadow:var(--sh,none);flex:none}
+.phero .week{position:relative;z-index:2;margin-bottom:0;padding:0}
+.phero .week div{color:var(--hmu);font-weight:600}
+.phero .week b{color:var(--wtx,var(--mtx));font-weight:650}
+.phero .week .on b{background:var(--tdbg)!important;color:var(--tdtx)!important;box-shadow:var(--tdsh,none)}
+.phero .week i{background:var(--hmu);opacity:.7}
+.phero .week .on i{background:var(--acc);opacity:1}
+.phero .goal{position:relative;z-index:2;margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--gbg);color:var(--gtx);box-shadow:var(--gsh,none)}
+.phero .goal .q small,.phero .goal .tm small,.phero .goal .tm b span{color:var(--gmu)}
+.phero .goal .q p.ph{color:var(--gmu)}
+.phero .goal .tm b{color:var(--gnum,inherit);font-size:18px}
+.day .card.dmain{position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:var(--bbg);color:var(--tx);box-shadow:var(--sh,none)}
+.dmain .todo,.dmain .ttb{position:relative;z-index:1}
+.dmain .todo{display:flex;flex-direction:column}
+.dmain .h{color:var(--tx)}
+.dmain .h span,.dmain .sub .sn u,.dmain .it .tt,.dmain .r em,.dmain .legend{color:var(--mu)}
+.dmain .sub .sn b{background:none;padding:0;display:flex;align-items:center;gap:6px}
+.dmain .sub .sn b:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--sc);flex:none}
+.dmain .sub .sn u{text-align:right}
+.dmain .ck{border-color:var(--ckb);background:var(--ckbg,transparent)}
+.dmain .ck.on{background:var(--c)}
+.dmain .ck svg{stroke:var(--ckm,#fff)}
+.dmain .it.done span{color:var(--mu);opacity:.8}
+.dmain .add{color:var(--mu)}.dmain .add i{border-color:var(--ckb)}
+.dmain .addsub{margin-top:auto;font-size:12.5px;font-weight:700;color:var(--btx);background:var(--bbtn);border-radius:12px;padding:10px 0;box-shadow:var(--bsh,none);flex:none}
+.dmain .tgrid{border-top-color:var(--tln);background:var(--tgbg,transparent);border-radius:2px}
+.dmain .r{border-bottom-color:var(--tln)}
+.dmain .r i{border-left-color:var(--tln2)}
+.dmain .r i:nth-child(2){border-left-color:var(--tln)}
+.dmain .addsub{position:sticky;bottom:0;z-index:2}

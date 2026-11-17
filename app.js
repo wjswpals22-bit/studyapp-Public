@@ -174,23 +174,10 @@ function renderHome() {
   const L = dayTodos(tk), doneN = L.filter(x => x.t.done).length;
   const tg = ctaTarget(tk);
   const freeRun = D.running && !D.running.tid && sub(D.running.sid);
-  let ctaHtml;
-  if (tg) {
-    const on = D.running && D.running.tid === tg.t.id, need = durMin(tg.t) * 60, got = todoSec(tg.t.id);
-    ctaHtml = `<div class="cta tap" data-cta="${tg.t.id}"><i class="dot" style="background:${tg.s.c};margin-left:2px"></i>
-      <div class="ct">${esc(tg.t.t)} ${on ? '공부 중' : got > 0 ? '이어서 공부하기' : '공부 시작하기'}<span id="ctaSub" class="num">${on ? '이번 세션 ' + hms((Date.now() - D.running.start) / 1000) : need > got ? '남은 목표 ' + kdur((need - got) / 60) : '목표 시간 달성'}</span></div>
-      <div class="pb2">${on ? PAUSE : PLAY}</div></div>`;
-  } else if (freeRun) {
-    ctaHtml = `<div class="cta tap" data-cta="free"><i class="dot" style="background:${freeRun.c};margin-left:2px"></i>
-      <div class="ct">${esc(freeRun.name)} 공부 중<span id="ctaSub" class="num">이번 세션 ${hms((Date.now() - D.running.start) / 1000)}</span></div><div class="pb2">${PAUSE}</div></div>`;
-  } else {
-    ctaHtml = `<div class="cta tap" data-cta="add"><i class="dot" style="background:#C5CCD3;margin-left:2px"></i>
-      <div class="ct">오늘 할 일 추가하기<span>플래너에 시간 할 일을 넣으면 여기서 바로 시작해요</span></div><div class="pb2">${PLUS}</div></div>`;
-  }
+  const ctaHtml = `<div class="cta vowc tap" data-act="vow"><div class="ct"><span>오늘의 다짐</span>${vow && vow.text ? `${vow.emo ? esc(vow.emo) + ' ' : ''}${esc(vow.text)}` : '<em>오늘의 다짐을 적어보세요</em>'}</div><div class="pb2">${PEN}</div></div>`;
   const leftMin = gm - total / 60;
   screen.innerHTML = `<div class="scroll home"><div class="wrap">
     <div class="head"><div class="d">홈<span>${now.getMonth() + 1}월 ${now.getDate()}일 ${WD[now.getDay()]}요일</span></div><div class="av tap" data-act="profile">${AV}</div></div>
-    ${D.vowHome && vow && vow.text ? `<div class="vow">${esc(vow.text)}</div>` : ''}
     <div class="hc hero">
       <div class="top"><span class="l"><i class="${D.running ? 'run' : ''}"></i>오늘 공부시간</span><span class="dd tap" data-act="dday">${dd ? esc(dd.name) + ' ' + ddayText(dd.date, tk) : 'D-day 설정'}</span></div>
       <div class="main">
@@ -228,7 +215,7 @@ function tickHome() {
 // =========================================================
 //  플래너 — 달력
 // =========================================================
-function dayItems(k) { return dayTodos(k).map(({ s, t }) => ({ text: t.t, l: s.l, done: t.done })); }
+function dayItems(k) { return dayTodos(k).map(({ s, t }) => ({ text: t.t, l: s.l, c: s.c, done: t.done })); }
 function renderCal() {
   const y = R.calY, m = R.calM, first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate(), tk = todayKey();
   const lead = first.getDay(), rows = Math.ceil((lead + days) / 7);
@@ -236,16 +223,84 @@ function renderCal() {
   for (let d = 1; d <= days; d++) {
     const k = dkey(new Date(y, m, d)), w = (lead + d - 1) % 7, L = dayItems(k);
     const cls = ['cd', 'tap', w === 0 ? 'sun' : '', w === 6 ? 'sat' : '', k > tk ? 'fut' : '', k === tk ? 'today' : ''].join(' ');
-    h += `<div class="${cls}" data-day="${k}"><b class="num">${d}</b>${L.slice(0, 4).map(t => `<span class="ctg${t.done ? ' ok' : ''}" style="--l:${t.l}">${esc(t.text)}</span>`).join('')}${L.length > 4 ? `<div class="more">+${L.length - 4}</div>` : ''}</div>`;
+    h += `<div class="${cls}" data-day="${k}"><b class="num">${d}</b>${L.slice(0, 4).map(t => `<span class="ctg${t.done ? ' ok' : ''}${k < tk ? ' past' : ''}"><i style="background:${t.c}"></i>${esc(t.text)}</span>`).join('')}${L.length > 4 ? `<div class="more">+${L.length - 4}</div>` : ''}</div>`;
   }
   screen.innerHTML = `<div class="scroll cal" style="overflow:hidden"><div class="wrap">
     <div class="head"><span class="tt">플래너</span><div class="av tap" data-act="profile">${AV}</div></div>
-    <div class="card">
-      <div class="mon"><b>${y}년 ${m + 1}월</b><div class="ar"><i class="tap" data-mon="-1"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></i><i class="tap" data-mon="1"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></i></div></div>
-      <div class="wk">${WD.map(w => `<span>${w}</span>`).join('')}</div>
-      <div class="cgrid" style="grid-template-rows:repeat(${rows},1fr)">${h}</div>
+    <div class="card plc">
+      <div class="band"><div class="mon">${TM[curTheme().k] && TM[curTheme().k].sign ? `<div class="sign"><b>${y}년 ${m + 1}월</b></div>` : `<div>${TM[curTheme().k] && TM[curTheme().k].kick ? `<small>${TM[curTheme().k].kick.replace('OCT', ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][m])}</small>` : ''}<b>${y}년 ${m + 1}월</b></div>`}<div class="ar"><i class="tap" data-mon="-1"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></i><i class="tap" data-mon="1"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></i></div></div></div>
+      <div class="pbody"><div class="wk">${WD.map(w => `<span>${w}</span>`).join('')}</div>
+      <div class="cgrid" style="grid-template-rows:repeat(${rows},1fr)">${h}</div></div>
     </div></div></div>`;
+  const th = plVars(screen.querySelector('.cal'));
+  plDeco(screen.querySelector('.band'), th.band); plDeco(screen.querySelector('.pbody'), th.body);
 }
+
+
+// =========================================================
+//  플래너 테마 그림 (스터디룸 테마를 따라감) — 디자인: 플래너/테마5종/planner.html
+// =========================================================
+let W = 336;
+function rnd(s){let x=s;return()=>(x=(x*9301+49297)%233280)/233280}
+const svg=(w,h,inner,cls='')=>`<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${inner}</svg>`;
+const enc=s=>`url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+
+// ---------- 그림 조각 ----------
+const rain=(w,h,n,seed,op)=>{const r=rnd(seed);let s='';for(let i=0;i<n;i++){const x=r()*w,y=r()*h,l=6+r()*10;s+=`<path d="M${x.toFixed(1)} ${y.toFixed(1)}l-${(l*.18).toFixed(1)} ${l.toFixed(1)}"/>`}return `<g stroke="#AFC0E6" stroke-width=".7" stroke-linecap="round" opacity="${op}">${s}</g>`};
+const petal=(x,y,r,a,c,o)=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.62}" fill="${c}" opacity="${o}" transform="rotate(${a} ${x} ${y})"/>`;
+const petals=(w,h,n,seed,o)=>{const r=rnd(seed);let s='';for(let i=0;i<n;i++)s+=petal((r()*w).toFixed(1),(r()*h).toFixed(1),2.4+r()*2.2,(r()*180)|0,i%3?'#F6A9BC':'#FBC7D4',o);return s};
+const flower=(x,y,r,c='#F7B3C4',cc='#E86F8E')=>{let s='';for(let k=0;k<5;k++){const a=k*72*Math.PI/180;s+=`<circle cx="${(x+Math.sin(a)*r*.62).toFixed(1)}" cy="${(y-Math.cos(a)*r*.62).toFixed(1)}" r="${r*.52}" fill="${c}"/>`}return s+`<circle cx="${x}" cy="${y}" r="${r*.28}" fill="${cc}"/>`};
+function bunting(w,y0,sag,cols){let s=`<path d="M-4 ${y0} Q${w/2} ${y0+sag*2} ${w+4} ${y0}" fill="none" stroke="#D99AAA" stroke-width="1"/>`;const n=11;for(let i=1;i<n;i++){const t=i/n,x=-4+(w+8)*t,y=(1-t)*(1-t)*y0+2*(1-t)*t*(y0+sag*2)+t*t*y0;s+=`<path d="M${x-6} ${y-1}L${x+6} ${y-1}L${x} ${y+10}z" fill="${cols[i%cols.length]}"/>`}return s}
+function lights(w,y0,sag,cols,n){let s=`<path d="M-4 ${y0} Q${w/2} ${y0+sag*2} ${w+4} ${y0}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="1"/>`;for(let i=1;i<n;i++){const t=i/n,x=-4+(w+8)*t,y=(1-t)*(1-t)*y0+2*(1-t)*t*(y0+sag*2)+t*t*y0,c=cols[i%cols.length];s+=`<circle cx="${x}" cy="${y+4}" r="8" fill="${c}" opacity=".22"/><rect x="${x-1.2}" y="${y-.5}" width="2.4" height="2.5" fill="#2a2018"/><circle cx="${x}" cy="${y+4}" r="2.5" fill="${c}"/>`}return s}
+const planks=(w,h)=>{let s='';for(let y=0;y<h;y+=22)s+=`<rect x="0" y="${y}" width="${w}" height="22" fill="${(y/22)%2?'#6A4C34':'#634630'}"/><path d="M0 ${y+.5}H${w}" stroke="#4A3322" stroke-width="1"/>`;const r=rnd(5);for(let i=0;i<5;i++){const x=r()*w,y=r()*h;s+=`<ellipse cx="${x}" cy="${y}" rx="5" ry="2" fill="none" stroke="#523925" stroke-width=".8"/>`}for(let y=0;y<h;y+=22){const x=40+r()*(w-80);s+=`<path d="M${x} ${y}V${y+22}" stroke="#4A3322" stroke-width="1"/>`}return s};
+const pine=(x,y,s,c)=>`<path d="M${x} ${y-s*2.4}L${x+s*.75} ${y-s*1.3}H${x+s*.35}L${x+s} ${y-s*.3}H${x-s}L${x-s*.35} ${y-s*1.3}H${x-s*.75}z" fill="${c}"/><rect x="${x-s*.12}" y="${y-s*.3}" width="${s*.24}" height="${s*.4}" fill="${c}"/>`;
+const pines=(w,y,seed,c,o)=>{const r=rnd(seed);let s=`<g opacity="${o}">`;for(let x=6;x<w;x+=14+r()*16)s+=pine(x,y,7+r()*7,c);return s+'</g>'};
+const flakes=(w,h,n,seed,o,c='#fff')=>{const r=rnd(seed);let s='';for(let i=0;i<n;i++)s+=`<circle cx="${(r()*w).toFixed(1)}" cy="${(r()*h).toFixed(1)}" r="${(.7+r()*1.5).toFixed(1)}" fill="${c}" opacity="${(o*(.4+r()*.6)).toFixed(2)}"/>`;return s};
+const snowcap=(w,base)=>{let d=`M0 0H${w}V${base}`;const r=rnd(11);for(let x=w;x>0;x-=22){const dip=base+3+r()*9;d+=` Q${x-6} ${dip+6} ${x-11} ${dip} T${x-22} ${base}`}return `<path d="${d}V0z" fill="#F7FAFF"/><path d="${d.replace(/^M0 0H\d+V/,'M'+w+' ')}" fill="none" stroke="#D5E2F4" stroke-width="1" opacity=".8"/>`};
+const waves=(w,y,c,amp,len,o=1)=>{let d=`M0 ${y}`;for(let x=0;x<w;x+=len)d+=` q${len/4} -${amp} ${len/2} 0 t${len/2} 0`;return `<path d="${d}V${y+400}H0z" fill="${c}" opacity="${o}"/>`};
+const cloud=(x,y,s,o)=>`<g fill="#fff" opacity="${o}"><ellipse cx="${x}" cy="${y}" rx="${14*s}" ry="${6*s}"/><circle cx="${x-5*s}" cy="${y-4*s}" r="${6*s}"/><circle cx="${x+4*s}" cy="${y-6*s}" r="${7.5*s}"/></g>`;
+const gull=(x,y,s)=>`<path d="M${x-5*s} ${y}q${2.5*s} -${3*s} ${5*s} 0q${2.5*s} -${3*s} ${5*s} 0" fill="none" stroke="#5B7D96" stroke-width="1.1" stroke-linecap="round"/>`;
+const stars=(w,h,n,seed)=>{const r=rnd(seed);let s='';for(let i=0;i<n;i++)s+=`<circle cx="${(r()*w).toFixed(1)}" cy="${(r()*h).toFixed(1)}" r="${(.5+r()*.8).toFixed(1)}" fill="#FFF6D8" opacity="${(.3+r()*.6).toFixed(2)}"/>`;return s};
+const vinyl=(cx,cy,R)=>{let g='';for(let k=R*.42;k<R*.95;k+=3)g+=`<circle cx="${cx}" cy="${cy}" r="${k}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width=".6"/>`;return `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#141320"/>${g}<circle cx="${cx}" cy="${cy}" r="${R*.34}" fill="#E9A766"/><circle cx="${cx}" cy="${cy}" r="2" fill="#141320"/>`};
+
+// ---------- 테마 정의 ----------
+let FLOWER=enc(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${flower(12,12,23,'#F08FA8','#F08FA8')}</svg>`);
+const TM={
+lofi:{grain:1,c:['#E59A8C','#8FA8E0','#86C29C','#E2B86A'],kick:'LO-FI NIGHT · OCT',
+ v:{'--bbg':'linear-gradient(180deg,#2E2B42,#1F1E2D)','--hbg':'linear-gradient(172deg,#3A3653,#2A283E)','--tx':'#ECE5F4','--mu':'rgba(236,229,244,.48)','--ln':'rgba(255,255,255,.07)','--tg':'rgba(255,255,255,.07)','--tt':'rgba(236,229,244,.86)','--sun':'#E9A394','--sat':'#9EB3E6','--kick':'#F0B470','--mtx':'#F7E2C0','--abg':'rgba(255,255,255,.08)','--aic':'#E8DDF2','--tdbg':'#F0B470','--tdtx':'#1D1C2A','--tdsh':'0 0 0 3px rgba(240,180,112,.18),0 0 14px rgba(240,180,112,.55)','--acc':'#F0B470','--hmu':'rgba(236,229,244,.5)','--gbg':'rgba(255,255,255,.07)','--gtx':'#ECE5F4','--gmu':'rgba(236,229,244,.5)','--gnum':'#F7E2C0','--gsh':'inset 0 0 0 1px rgba(255,255,255,.06)','--ddbg':'#2A283E','--ddtx':'#F0C48E','--ckb':'rgba(236,229,244,.28)','--ckm':'#1F1E2D','--btx':'#1D1C2A','--bbtn':'#F0B470','--bsh':'0 6px 16px -6px rgba(240,180,112,.6)','--tln':'rgba(255,255,255,.09)','--tln2':'rgba(255,255,255,.04)','--sh':'0 14px 28px -16px rgba(20,18,34,.8)','--grain':'.16'},
+ band:()=>`<rect width="${W}" height="88" fill="url(#lg)"/><defs><radialGradient id="lg" cx=".82" cy=".1" r=".6"><stop offset="0" stop-color="#F0B470" stop-opacity=".28"/><stop offset="1" stop-color="#F0B470" stop-opacity="0"/></radialGradient></defs>${rain(W,88,30,7,.25)}<circle cx="246" cy="26" r="9" fill="#F7E2C0" opacity=".9"/><circle cx="250" cy="23" r="8" fill="#38344F"/>`,
+ body:(h)=>rain(W,h,80,9,.12)+`<rect x="0" y="${h-120}" width="${W}" height="120" fill="url(#lb)"/><defs><linearGradient id="lb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0B470" stop-opacity="0"/><stop offset="1" stop-color="#F0B470" stop-opacity=".07"/></linearGradient></defs>`,
+ hero:(h)=>`<defs><radialGradient id="hg" cx=".9" cy=".05" r=".7"><stop offset="0" stop-color="#F0B470" stop-opacity=".3"/><stop offset="1" stop-color="#F0B470" stop-opacity="0"/></radialGradient></defs><rect width="${W}" height="${h}" fill="url(#hg)"/>${rain(W,h,40,3,.22)}`,
+ hpt:'14px'},
+cherry:{c:['#EF8DA6','#8FB0E8','#86C7A0','#EDBB64'],kick:'SPRING · 벚꽃 봄',
+ v:{'--bbg':'linear-gradient(180deg,#FFF7F8,#FFF0F3)','--hbg':'linear-gradient(180deg,#FFE3EA,#FDEFF2)','--tx':'#4E3640','--mu':'#B98D9A','--ln':'#F7DCE3','--tg':'#fff','--tt':'#5E4450','--tgsh':'0 0 0 1px #F6DDE4','--sun':'#E8728F','--sat':'#7C9BD8','--kick':'#E8728F','--mtx':'#4E3640','--abg':'#fff','--ash':'0 2px 6px -2px rgba(232,114,143,.35)','--aic':'#C26F86','--tdbg':FLOWER+' center/100% 100% no-repeat','--tdtx':'#fff','--acc':'#E8728F','--hmu':'#B98D9A','--gbg':'#fff','--gtx':'#4E3640','--gmu':'#B98D9A','--gnum':'#E05F80','--gsh':'0 4px 12px -6px rgba(232,114,143,.35)','--ddbg':'#FFE3EA','--ddtx':'#D35A7A','--ckb':'#EBC6D0','--ckbg':'#fff','--btx':'#fff','--bbtn':'#EC7A97','--bsh':'0 6px 14px -6px rgba(236,122,151,.7)','--tln':'#F5DAE1','--tln2':'#FBEDF1','--tgbg':'#fff','--sh':'0 12px 26px -18px rgba(214,110,140,.55)'},
+ band:()=>{let br=`<path d="M${W+6} 4 C300 14 286 30 262 34 M300 15 C306 26 304 36 298 44 M282 27 C276 36 270 42 258 46" stroke="#8A5A4A" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;[[300,10,9],[276,26,8],[260,36,7],[298,42,7],[312,26,7],[284,40,5]].forEach(([x,y,r])=>br+=flower(x,y,r));return bunting(W,2,9,['#F7B3C4','#FBE3A8','#BFE0C8','#C7D8F4','#F6C9D5'])+br+petals(W,88,10,21,.7)},
+ body:(h)=>petals(W,h,26,13,.35)+`<path d="M0 ${h-14} Q${W/2} ${h-26} ${W} ${h-12} V${h}H0z" fill="#FBD9E2" opacity=".55"/>`,
+ hero:(h)=>{let br='';[[318,22,10],[300,10,8],[330,40,8],[288,24,6]].forEach(([x,y,r])=>br+=flower(x,y,r));return bunting(W,2,8,['#F7B3C4','#FBE3A8','#BFE0C8','#C7D8F4','#F6C9D5'])+`<path d="M${W+4} 30 C320 26 306 18 296 12" stroke="#8A5A4A" stroke-width="2" fill="none"/>`+br+petals(W,h,14,4,.6)},
+ hpt:'32px'},
+forest:{c:['#D07D5F','#6F93BE','#7FA86B','#D9A64E'],kick:'',sign:1,
+ v:{'--bbg':'linear-gradient(180deg,#FBF4E6,#F5EBD6)','--hbg':'#634630','--tx':'#4A3624','--mu':'#A48B6E','--ln':'#EADBBE','--tg':'#F1E3C6','--tt':'#56402B','--sun':'#C46A4E','--sat':'#5F82AE','--kick':'#F2D08A','--mtx':'#4A3624','--abg':'#7B5A3E','--ash':'inset 0 -2px 0 #4A3322','--aic':'#F6E6C8','--tdbg':'radial-gradient(circle,#FFD983 0,#EFAF45 70%)','--tdtx':'#4A3020','--tdsh':'0 0 0 3px rgba(239,175,69,.22),0 0 12px rgba(239,175,69,.6)','--acc':'#F2C15E','--hmu':'rgba(246,230,200,.6)','--wtx':'#F6E6C8','--gbg':'#F7EBD3','--gtx':'#4A3624','--gmu':'#A48B6E','--gnum':'#7A4E26','--gsh':'0 3px 0 #3E2A1B, inset 0 0 0 1px #E3CFA8','--ddbg':'#634630','--ddtx':'#F6DFA8','--ckb':'#D8C39C','--ckbg':'#FFFBF2','--btx':'#F8EBD0','--bbtn':'#6A4B32','--bsh':'inset 0 -3px 0 #4A3322','--tln':'#E6D5B4','--tln2':'#F1E6CF','--tgbg':'#FFFBF2','--sh':'0 12px 26px -16px rgba(74,51,34,.6)'},
+ band:()=>planks(W,88)+lights(W,6,9,['#FFD27A','#FFB46A','#FFE7A6'],13),
+ body:(h)=>pines(W,h+4,8,'#6E8A5A',.1),
+ hero:(h)=>planks(W,h)+lights(W,4,8,['#FFD27A','#FFB46A','#FFE7A6'],13)+`<g transform="translate(300 ${h-64})"><path d="M8 -12V0" stroke="#2a2018" stroke-width="1.2"/><rect x="0" y="0" width="16" height="4" rx="1" fill="#3A2A1E"/><rect x="1.5" y="4" width="13" height="18" rx="2" fill="#FFCB6B" opacity=".9"/><circle cx="8" cy="13" r="16" fill="#FFCB6B" opacity=".18"/><path d="M1.5 4h13v18h-13zM8 4v18" fill="none" stroke="#3A2A1E" stroke-width="1.4"/><rect x="0" y="22" width="16" height="3" rx="1" fill="#3A2A1E"/></g>`,
+ hpt:'34px'},
+sea:{c:['#F0957E','#4F98D6','#4FB9A2','#EDB94F'],kick:'SEASIDE · 바닷가',
+ v:{'--bbg':'linear-gradient(180deg,#FBFEFF,#EEF8FC)','--hbg':'linear-gradient(180deg,#A9DBF3,#DDF2FA)','--tx':'#1F3D55','--mu':'#86A4B8','--ln':'#E0EFF6','--tg':'#E6F4FA','--tt':'#2B4D66','--sun':'#E87D66','--sat':'#2F86C4','--kick':'#2F86C4','--mtx':'#163A57','--abg':'rgba(255,255,255,.75)','--aic':'#2F6E9C','--tdbg':'linear-gradient(180deg,#fff 0 48%,#8FD0EF 48%)','--tdtx':'#163A57','--tdsh':'0 0 0 2px #2F86C4','--acc':'#2F86C4','--hmu':'#4C7A98','--gbg':'#fff','--gtx':'#1F3D55','--gmu':'#86A4B8','--gnum':'#1F6FAE','--gsh':'0 6px 14px -8px rgba(31,111,174,.45)','--ddbg':'#DDF2FA','--ddtx':'#1F6FAE','--ckb':'#C6DDE9','--ckbg':'#fff','--btx':'#fff','--bbtn':'#2F86C4','--bsh':'0 6px 14px -6px rgba(47,134,196,.6)','--tln':'#DDECF3','--tln2':'#EEF6FA','--tgbg':'#fff','--sh':'0 12px 26px -18px rgba(31,111,174,.5)'},
+ band:()=>`<circle cx="292" cy="20" r="26" fill="#FFF3C4" opacity=".55"/><circle cx="292" cy="20" r="13" fill="#FFE59A"/>`+cloud(70,22,1.1,.9)+cloud(190,14,.8,.8)+gull(140,30,1)+gull(156,24,.8)+gull(236,38,.7)+waves(W,74,'#7CC4EA',4,48,.9)+waves(W,80,'#4FA6DA',4,40,.9),
+ body:(h)=>waves(W,h-22,'#D5EEF8',5,64,.9)+waves(W,h-12,'#BFE4F4',5,52,.9),
+ hero:(h)=>`<circle cx="312" cy="12" r="16" fill="#FFF3C4" opacity=".55"/><circle cx="312" cy="12" r="8" fill="#FFE59A"/>`+cloud(40,12,.7,.85)+cloud(200,10,.55,.75)+gull(130,12,.8)+gull(142,8,.6)+waves(W,h-30,'#7CC4EA',4,48,.85)+waves(W,h-22,'#4FA6DA',4,40,.85),
+ hpt:'28px'},
+snow:{grain:1,c:['#F08A8A','#8DB4F0','#8FD0B4','#EFCB76'],kick:'SNOWY NIGHT · 눈 오는 밤',
+ v:{'--bbg':'linear-gradient(180deg,#27304D,#1B2238)','--hbg':'linear-gradient(180deg,#323C5E,#27304D)','--tx':'#E8EEF8','--mu':'rgba(232,238,248,.48)','--ln':'rgba(255,255,255,.07)','--tg':'rgba(255,255,255,.08)','--tt':'rgba(232,238,248,.88)','--sun':'#F29A9A','--sat':'#A9C6F2','--kick':'#A9C8F0','--mtx':'#FFFFFF','--abg':'rgba(255,255,255,.1)','--aic':'#E8EEF8','--tdbg':'#fff','--tdtx':'#1B2238','--tdsh':'0 0 0 3px rgba(169,200,240,.25),0 0 14px rgba(255,255,255,.45)','--acc':'#E85D5D','--hmu':'rgba(232,238,248,.55)','--gbg':'#F7FAFF','--gtx':'#1F2A44','--gmu':'#8A97AE','--gnum':'#1F2A44','--gsh':'0 6px 14px -8px rgba(0,0,0,.5)','--ddbg':'#27304D','--ddtx':'#fff','--ckb':'rgba(232,238,248,.3)','--ckm':'#1B2238','--btx':'#1F2A44','--bbtn':'#F7FAFF','--bsh':'0 0 0 1px #D5E2F4,0 6px 14px -6px rgba(255,255,255,.3)','--tln':'rgba(255,255,255,.09)','--tln2':'rgba(255,255,255,.04)','--sh':'0 14px 28px -16px rgba(16,20,36,.8)','--grain':'.1'},
+ band:()=>stars(W,88,18,2)+flakes(W,88,26,6,.8)+snowcap(W,12),
+ body:(h)=>flakes(W,h,34,17,.3)+`<path d="M0 ${h-26} Q90 ${h-46} 190 ${h-30} T${W} ${h-34}V${h}H0z" fill="#EAF1FB" opacity=".12"/>`+pines(W,h-14,3,'#EAF1FB',.08),
+ hero:(h)=>stars(W,h,10,8)+flakes(W,h,12,12,.45)+snowcap(W,12),
+ hpt:'32px'}
+};
+
+function plVars(el) { const th = TM[curTheme().k] || TM.lofi; for (const k in th.v) el.style.setProperty(k, th.v[k]); el.classList.toggle('plgrain', !!th.grain); return th; }
+const plSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${inner}</svg>`;
+function plDeco(el, fn, cls) { if (!el) return; const r = el.getBoundingClientRect(); W = Math.round(r.width) || 336; const h = Math.round(r.height) || 88; el.insertAdjacentHTML('afterbegin', plSvg(W, h, fn(h), cls || 'pbg')); }
 
 // =========================================================
 //  플래너 — 기입 화면
@@ -260,14 +315,14 @@ function renderDay() {
   const vow = D.vows[k], gm = goalMin(k);
   screen.innerHTML = `<div class="scroll day" style="overflow:hidden"><div class="wrap">
     <div class="dh"><svg class="tap" data-act="back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><b>${dt.getMonth() + 1}월 ${dt.getDate()}일 ${WD[dt.getDay()]}요일</b><span class="tap" data-act="dday">${dd ? esc(dd.name) + ' ' + ddayText(dd.date, k) : 'D-day 설정'}</span></div>
-    <div class="week">${[0, 1, 2, 3, 4, 5, 6].map(i => { const x = addDays(sun, i), xk = dkey(x); return `<div class="tap${xk === k ? ' on' : ''}" data-day="${xk}">${WD[i]}<b class="num">${x.getDate()}</b><i style="${(D.plans[xk] || []).length || xk === k ? '' : 'visibility:hidden'}"></i></div>`; }).join('')}</div>
-    <div class="card goal">
+    <div class="card phero" style="--hpt:${(TM[curTheme().k] || {}).hpt || '14px'}"><div class="week">${[0, 1, 2, 3, 4, 5, 6].map(i => { const x = addDays(sun, i), xk = dkey(x); return `<div class="tap${xk === k ? ' on' : ''}" data-day="${xk}">${WD[i]}<b class="num">${x.getDate()}</b><i style="${(D.plans[xk] || []).length || xk === k ? '' : 'visibility:hidden'}"></i></div>`; }).join('')}</div>
+    <div class="goal">
       <div class="q tap" data-act="vow"><small>오늘의 다짐</small><p class="${vow && vow.text ? '' : 'ph'}">${vow && vow.text ? esc(vow.text) : '한 줄 다짐을 적어보세요'}</p></div>
       <div class="tm"><small>공부시간</small><b class="num" id="dayT">${hm(studiedSec(k))}<span> / ${gm ? Math.round(gm / 6) / 10 + 'h' : '-'}</span></b></div>
-    </div>
+    </div></div>
     <div class="card dmain">
       <div class="todo"><div class="h">할 일<span class="num">${done} / ${all}</span></div>
-        ${P.map(p => { const s = sub(p.sid), pi = D.plans[k].indexOf(p), rg = planRange(p); return `<div class="sub" style="--l:${s.l}">
+        ${P.map(p => { const s = sub(p.sid), pi = D.plans[k].indexOf(p), rg = planRange(p); return `<div class="sub" style="--l:${s.l};--sc:${s.c}">
           <div class="sn"><b>${esc(s.name)}</b><u class="num">${rg}</u></div>
           ${p.todos.map(t => `<div class="it${t.done ? ' done' : ''}"><div class="ck tap${t.done ? ' on' : ''}" style="--c:${s.c}" data-ck="${t.id}">${t.done ? CK : ''}</div><span class="tap" data-edit="${t.id}">${esc(t.t)}${t.kind === 'time' ? `<em class="tt num">${t.st}~${t.en}</em>` : ''}</span></div>`).join('')}
           <div class="add tap" data-addtodo="${pi}"><i>+</i>할 일 추가</div></div>`; }).join('')}
@@ -277,6 +332,8 @@ function renderDay() {
         <div class="legend"><span><i class="p"></i>계획</span><span><i></i>공부</span></div></div>
     </div></div></div>`;
   drawTimetable(k);
+  const th = plVars(screen.querySelector('.day'));
+  plDeco(screen.querySelector('.phero'), th.hero); plDeco(screen.querySelector('.dmain'), th.body);
 }
 function drawTimetable(k) {
   const base = kdate(k).getTime() + 6 * 3600e3; // 6시부터 19시간(6~0시)
@@ -611,7 +668,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.8</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.9</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
