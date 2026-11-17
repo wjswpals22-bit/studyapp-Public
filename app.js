@@ -136,13 +136,19 @@ const THEMES = [
   { k: 'train', n: '공부 기차여행', d: '반짝이는 바다 옆을 달리는 공부열차', bg: '#F4EFE7', light: true, isNew: 1 },
   { k: 'orb', n: '집중 오브', d: '공부할수록 커지는 빛, 군더더기 없는 집중', bg: '#EEE8DE', light: true, isNew: 1 }
 ];
+const CATS = [
+  { k: 'animal', n: '동물', d: '귀여운 친구들과 함께 공부해요', tone: '#F6E7D8', ink: '#8A5A3C', ks: ['lofi', 'cherry', 'forest', 'sea', 'snow'] },
+  { k: 'mood', n: '감성', d: '창밖 풍경이 흐르는 분위기 공부방', tone: '#E3EEF5', ink: '#3E7FA8', ks: ['train'] },
+  { k: 'focus', n: '집중', d: '장식은 덜고 공부에만 몰입해요', tone: '#EEE8DE', ink: '#6B5E4E', ks: ['orb'] }
+];
+const thImg = k => `img/${k === 'lofi' ? 'v2' : k}_wide.jpg`;
 const curTheme = () => THEMES.find(t => t.k === D.roomTheme) || THEMES[0];
 
 // ---------- 라우팅 ----------
-const R = { tab: 'home', day: null, calY: new Date().getFullYear(), calM: new Date().getMonth() };
+const R = { tab: 'home', day: null, shopCat: null, calY: new Date().getFullYear(), calM: new Date().getMonth() };
 const $ = s => document.querySelector(s);
 const screen = $('#screen');
-function go(tab) { R.tab = tab; R.day = null; render(); }
+function go(tab) { R.tab = tab; R.day = null; R.shopCat = null; render(); }
 function openDay(k) { R.tab = 'planner'; R.day = k; const d = kdate(k); R.calY = d.getFullYear(); R.calM = d.getMonth(); render(); }
 function render() {
   $('#tab').innerHTML = TABS.map(([k, n, p]) => `<div class="tb tap${R.tab === k ? ' on' : ''}" data-tab="${k}"><svg viewBox="0 0 24 24">${p}</svg>${n}</div>`).join('');
@@ -401,11 +407,30 @@ function tickRoom() {
 // =========================================================
 function renderShop() {
   const cur = curTheme().k;
+  const BK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+  const cat = CATS.find(c => c.k === R.shopCat);
+  if (cat) {
+    const list = cat.ks.map(k => THEMES.find(t => t.k === k));
+    screen.innerHTML = `<div class="scroll soon shop"><div class="wrap">
+      <div class="head shh" style="padding:0 4px"><button class="bk tap" data-act="shopback">${BK}</button><span class="tt">${cat.n} 테마</span><div class="av tap" data-act="profile">${AV}</div></div>
+      <div class="cathero" style="--tone:${cat.tone};--ink:${cat.ink}"><b>${cat.n}</b><span>${cat.d}</span><em>${list.length}개 테마</em></div>
+      ${list.map(t => `<div class="thc${t.k === cur ? ' on' : ''}"><div class="thimg" style="background-image:url(${thImg(t.k)})">${t.isNew ? '<u class="new">NEW</u>' : ''}</div>
+        <div class="thb"><div><b>${t.n}</b><span>${t.d}</span><i class="price">무료</i></div>${t.k === cur ? '<em>적용 중</em>' : `<button class="tap" data-theme="${t.k}">적용하기</button>`}</div></div>`).join('')}
+    </div></div>`;
+    return;
+  }
+  const ct = curTheme();
   screen.innerHTML = `<div class="scroll soon shop"><div class="wrap">
     <div class="head" style="padding:0 4px"><span class="tt">상점</span><div class="av tap" data-act="profile">${AV}</div></div>
-    <div class="sec"><b>스터디룸 테마</b><span style="padding-left:0">적용하면 홈 배너와 스터디룸이 바뀌어요</span></div>
-    ${THEMES.map(t => `<div class="thc${t.k === cur ? ' on' : ''}"><div class="thimg" style="background-image:url(img/${t.k === 'lofi' ? 'v2' : t.k}_wide.jpg)"></div>
-      <div class="thb"><div><b>${t.n}${t.isNew ? '<u class="new">NEW</u>' : ''}</b><span>${t.d}</span></div>${t.k === cur ? '<em>적용 중</em>' : `<button class="tap" data-theme="${t.k}">적용하기</button>`}</div></div>`).join('')}
+    <div class="nowth"><div class="nimg" style="background-image:url(${thImg(ct.k)})"></div><div><span>지금 적용 중</span><b>${ct.n}</b></div></div>
+    <div class="sec"><b>테마 카테고리</b><span>원하는 분위기를 골라보세요</span></div>
+    ${CATS.map(c => {
+      const ts = c.ks.map(k => THEMES.find(t => t.k === k));
+      const has = c.ks.includes(ct.k), nw = ts.some(t => t.isNew);
+      return `<div class="catc tap" data-cat="${c.k}" style="--tone:${c.tone};--ink:${c.ink}">
+        <div class="ccov n${Math.min(ts.length, 5)}">${ts.map(t => `<i style="background-image:url(${thImg(t.k)})"></i>`).join('')}</div>
+        <div class="cb"><div><b>${c.n}${nw ? '<u class="new">NEW</u>' : ''}</b><span>${c.d}</span></div><div class="cr"><em>${ts.length}개${has ? ' · 적용 중' : ''}</em><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></div></div>`;
+    }).join('')}
   </div></div>`;
 }
 function renderSoon() {
@@ -423,6 +448,8 @@ function renderSoon() {
 // =========================================================
 function toggleTodo(tid) { const f = findTodo(tid); if (!f) return; f.t.done = !f.t.done; save(); }
 screen.addEventListener('click', e => {
+  const cb = e.target.closest('[data-cat]');
+  if (cb) { R.shopCat = cb.dataset.cat; render(); screen.querySelector('.scroll') && (screen.querySelector('.scroll').scrollTop = 0); return; }
   const tb = e.target.closest('[data-theme]');
   if (tb) { D.roomTheme = tb.dataset.theme; save(); render(); toast(curTheme().n + ' 테마를 적용했어요'); return; }
   const el = e.target.closest('[data-act],[data-day],[data-mon],[data-play],[data-ck],[data-hck],[data-edit],[data-addtodo],[data-pick],[data-cta]');
@@ -437,6 +464,7 @@ screen.addEventListener('click', e => {
     else if (a === 'newsub') sheetSubjectEdit(null);
     else if (a === 'today') openDay(todayKey());
     else if (a === 'back') { R.day = null; render(); }
+    else if (a === 'shopback') { R.shopCat = null; render(); }
     else if (a === 'vow') sheetVow();
     else if (a === 'addplan') sheetTodo(null);
     else if (a === 'roomtoggle') {
@@ -684,7 +712,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.12</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.13</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
@@ -707,6 +735,7 @@ function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('o
 window.appBack = function () {
   if (closeSheet()) return true;
   if (R.tab === 'planner' && R.day) { R.day = null; render(); return true; }
+  if (R.tab === 'shop' && R.shopCat) { R.shopCat = null; render(); return true; }
   if (R.tab !== 'home') { go('home'); return true; }
   return false;
 };
