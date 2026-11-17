@@ -366,3 +366,13 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .c.cdel b{display:flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:#E5E8EB;color:#6B7684;font-size:12px;font-weight:700;margin-left:2px;line-height:1}
 .c.cdel.arm{background:#FDEDEA;color:#E5574A;box-shadow:inset 0 0 0 1.5px #F4A99A}
 .c.cdel.arm b{background:#E5574A;color:#fff}
+/* v0.1.8: 삭제 확인창 (예/아니오) */
+.cfm{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;padding:0 36px;transition:background .18s}
+.cfm.on{background:rgba(0,0,0,.42)}
+.cfb{width:100%;max-width:300px;background:#fff;border-radius:20px;padding:24px 20px 16px;text-align:center;transform:scale(.94);opacity:0;transition:.18s}
+.cfm.on .cfb{transform:none;opacity:1}
+.cfb b{display:block;font-size:16.5px;font-weight:700;color:#191F28;line-height:1.4;word-break:keep-all}
+.cfb p{font-size:13px;color:#8B95A1;margin-top:6px;line-height:1.45;word-break:keep-all}
+.cfr{display:flex;gap:8px;margin-top:20px}
+.cfr div{flex:1;height:46px;border-radius:12px;background:#F2F4F6;color:#4E5968;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.cfr .yes{background:#E5574A;color:#fff}

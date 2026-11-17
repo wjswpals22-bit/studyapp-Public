@@ -443,25 +443,26 @@ function sheetTodo(tid, preSid, draft) {
     <div class="dur" id="pchk" style="margin:-4px 0 18px">홈 화면에 체크칸으로 떠요</div>
     <div class="btns">${edit ? '<div class="btn red tap" id="pdel">삭제</div>' : ''}<div class="btn tap" id="pok">${edit ? '저장' : '추가하기'}</div></div>`);
   const ptd = w.querySelector('#ptd');
-  let editing = false, armed = null;
+  let editing = false;
   const chips = () => {
     w.querySelector('#pedit').textContent = editing ? '완료' : '편집';
     w.querySelector('#pch').innerHTML = editing
-      ? (D.subjects.map(s => `<div class="c tap cdel${armed === s.id ? ' arm' : ''}" data-s="${s.id}" style="--c:${s.c};--l:${s.l}"><i></i>${armed === s.id ? '삭제할까요?' : esc(s.name)}<b>×</b></div>`).join('') || '<div class="dur" style="margin:0">테마가 없어요</div>')
+      ? (D.subjects.map(s => `<div class="c tap cdel" data-s="${s.id}" style="--c:${s.c};--l:${s.l}"><i></i>${esc(s.name)}<b>×</b></div>`).join('') || '<div class="dur" style="margin:0">테마가 없어요</div>')
       : D.subjects.map(s => `<div class="c tap${s.id === sel ? ' on' : ''}" data-s="${s.id}" style="--c:${s.c};--l:${s.l}"><i></i>${esc(s.name)}</div>`).join('') + '<div class="c new tap" data-s="__new">+ 새 테마</div>';
   };
   chips();
-  w.querySelector('#pedit').onclick = () => { editing = !editing; armed = null; chips(); };
+  w.querySelector('#pedit').onclick = () => { editing = !editing; chips(); };
   w.querySelector('#pch').onclick = e => {
     const c = e.target.closest('[data-s]'); if (!c) return;
     if (editing) {
-      const id = c.dataset.s;
-      if (armed !== id) { armed = id; chips(); toast('한 번 더 누르면 삭제돼요. 이 테마의 할 일도 함께 지워져요'); return; }
-      if (D.running && D.running.sid === id) stopTimer(true);
-      D.subjects = D.subjects.filter(x => x.id !== id);
-      for (const k in D.plans) D.plans[k] = D.plans[k].filter(p => p.sid !== id);
-      if (sel === id) sel = (D.subjects[0] || {}).id || null;
-      armed = null; save(); chips(); upd(); render(); toast('테마를 삭제했어요');
+      const id = c.dataset.s, sb = sub(id); if (!sb) return;
+      askConfirm(`'${esc(sb.name)}' 테마를 삭제하시겠습니까?`, '이 테마의 할 일도 함께 지워져요', () => {
+        if (D.running && D.running.sid === id) stopTimer(true);
+        D.subjects = D.subjects.filter(x => x.id !== id);
+        for (const k in D.plans) D.plans[k] = D.plans[k].filter(p => p.sid !== id);
+        if (sel === id) sel = (D.subjects[0] || {}).id || null;
+        save(); chips(); upd(); render(); toast('테마를 삭제했어요');
+      });
       return;
     }
     if (c.dataset.s === '__new') { const dr = { text: ptd.value.trim(), kind }; sheetSubjectEdit(null, ns => { const back = R.day; sheetTodo(null, ns, dr); }); return; }
@@ -508,9 +509,10 @@ function sheetTodo(tid, preSid, draft) {
   };
   const del = w.querySelector('#pdel');
   if (del) del.onclick = () => {
-    if (!del.dataset.c) { del.dataset.c = 1; del.textContent = '한 번 더'; return; }
-    if (D.running && D.running.tid === edit.id) stopTimer(true);
-    f.p.todos.splice(f.p.todos.indexOf(edit), 1); cleanPlans(f.k); save(); closeSheet(); render();
+    askConfirm('할 일을 삭제하시겠습니까?', esc(edit.t), () => {
+      if (D.running && D.running.tid === edit.id) stopTimer(true);
+      f.p.todos.splice(f.p.todos.indexOf(edit), 1); cleanPlans(f.k); save(); closeSheet(); render(); toast('할 일을 삭제했어요');
+    });
   };
 }
 
@@ -535,7 +537,7 @@ function sheetDday(editId) {
     save(); closeSheet(); render();
   };
   const del = w.querySelector('#ddel');
-  if (del) del.onclick = () => { D.ddays = D.ddays.filter(x => x.id !== ed.id); if (D.ddSel === ed.id) D.ddSel = (D.ddays[0] || {}).id || null; save(); sheetDday(); render(); };
+  if (del) del.onclick = () => askConfirm('D-day를 삭제하시겠습니까?', esc(ed.name), () => { D.ddays = D.ddays.filter(x => x.id !== ed.id); if (D.ddSel === ed.id) D.ddSel = (D.ddays[0] || {}).id || null; save(); sheetDday(); render(); });
 }
 
 // ----- 오늘의 다짐 -----
@@ -593,11 +595,12 @@ function sheetSubjectEdit(id, after, back) {
   };
   const del = w.querySelector('#sdel');
   if (del) del.onclick = () => {
-    if (!del.dataset.c) { del.dataset.c = 1; del.textContent = '한 번 더'; toast('삭제하면 이 테마의 할 일도 함께 사라져요'); return; }
-    if (D.running && D.running.sid === s.id) stopTimer(true);
-    D.subjects = D.subjects.filter(x => x.id !== s.id);
-    for (const k in D.plans) D.plans[k] = D.plans[k].filter(p => p.sid !== s.id);
-    save(); closeSheet(true); if (back) sheetSubjects(); render();
+    askConfirm(`'${esc(s.name)}' 테마를 삭제하시겠습니까?`, '이 테마의 할 일도 함께 지워져요', () => {
+      if (D.running && D.running.sid === s.id) stopTimer(true);
+      D.subjects = D.subjects.filter(x => x.id !== s.id);
+      for (const k in D.plans) D.plans[k] = D.plans[k].filter(p => p.sid !== s.id);
+      save(); closeSheet(true); if (back) sheetSubjects(); render(); toast('테마를 삭제했어요');
+    });
   };
 }
 
@@ -608,16 +611,23 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.7</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.8</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
   const r = w.querySelector('#reset');
-  r.onclick = () => { if (!r.dataset.c) { r.dataset.c = 1; r.textContent = '정말 지울까요?'; return; } localStorage.removeItem(KEY); D = defaults(); save(); closeSheet(); go('home'); toast('모든 기록을 지웠어요'); };
+  r.onclick = () => askConfirm('모든 기록을 삭제하시겠습니까?', '삭제한 기록은 되돌릴 수 없어요', () => { localStorage.removeItem(KEY); D = defaults(); save(); closeSheet(); go('home'); toast('모든 기록을 지웠어요'); });
 }
 
 // ---------- 토스트 ----------
 let tt;
+function askConfirm(msg, sub, onYes) {
+  const o = document.createElement('div'); o.className = 'cfm';
+  o.innerHTML = `<div class="cfb"><b>${msg}</b>${sub ? `<p>${sub}</p>` : ''}<div class="cfr"><div class="tap" data-n>아니오</div><div class="tap yes" data-y>예</div></div></div>`;
+  document.body.appendChild(o); requestAnimationFrame(() => o.classList.add('on'));
+  const close = () => { o.classList.remove('on'); setTimeout(() => o.remove(), 180); };
+  o.onclick = e => { if (e.target.closest('[data-y]')) { close(); onYes(); } else if (e.target.closest('[data-n]') || e.target === o) close(); };
+}
 function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2000); }
 
 // ---------- 뒤로가기 (안드로이드 버튼) ----------
