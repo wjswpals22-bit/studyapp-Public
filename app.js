@@ -145,11 +145,11 @@ const thImg = k => `img/${k === 'lofi' ? 'v2' : k}_wide.jpg`;
 const curTheme = () => THEMES.find(t => t.k === D.roomTheme) || THEMES[0];
 
 // ---------- 라우팅 ----------
-const R = { tab: 'home', day: null, shopCat: null, calY: new Date().getFullYear(), calM: new Date().getMonth() };
+const R = { tab: 'home', day: null, shopCat: null, dmode: 'plan', calY: new Date().getFullYear(), calM: new Date().getMonth() };
 const $ = s => document.querySelector(s);
 const screen = $('#screen');
-function go(tab) { R.tab = tab; R.day = null; R.shopCat = null; render(); }
-function openDay(k) { R.tab = 'planner'; R.day = k; const d = kdate(k); R.calY = d.getFullYear(); R.calM = d.getMonth(); render(); }
+function go(tab) { R.tab = tab; R.day = null; R.shopCat = null; R.dmode = 'plan'; render(); }
+function openDay(k) { R.tab = 'planner'; R.day = k; R.dmode = 'plan'; const d = kdate(k); R.calY = d.getFullYear(); R.calM = d.getMonth(); render(); }
 function render() {
   $('#tab').innerHTML = TABS.map(([k, n, p]) => `<div class="tb tap${R.tab === k ? ' on' : ''}" data-tab="${k}"><svg viewBox="0 0 24 24">${p}</svg>${n}</div>`).join('');
   const dark = R.tab === 'room', th = curTheme();
@@ -320,7 +320,33 @@ TM.orb = {grain: 1, kick: 'DEEP FOCUS', c: [],
  hero: (h) => `<defs><radialGradient id="obH" cx=".42" cy=".4" r=".5"><stop offset="0" stop-color="#FFE6B8"/><stop offset=".45" stop-color="#F7B37A"/><stop offset=".8" stop-color="#EE8B78" stop-opacity=".55"/><stop offset="1" stop-color="#EE8B78" stop-opacity="0"/></radialGradient><filter id="obG" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter></defs><circle cx="${W - 40}" cy="18" r="66" fill="url(#obH)" filter="url(#obG)" opacity=".85"/><circle cx="${W - 40}" cy="18" r="84" fill="none" stroke="rgba(27,26,25,.09)" stroke-dasharray="3 4"/>`,
  hpt: '14px'};
 
-function plVars(el) { const th = TM[curTheme().k] || TM.lofi; for (const k in th.v) el.style.setProperty(k, th.v[k]); el.classList.toggle('plgrain', !!th.grain); return th; }
+const DV = {"lofi": {"--sgbg": "#2A283E", "--sgon": "#F0B470", "--sgtx": "#1D1C2A", "--sgoff": "rgba(236,229,244,.6)", "--pp": "#2C2A40", "--pl": "rgba(255,255,255,.075)", "--pm": "rgba(240,180,112,.35)", "--hole": "#F2F4F6", "--ink": "#ECE5F4", "--ink2": "rgba(236,229,244,.5)", "--hl": "#F0B470", "--chip": "rgba(255,255,255,.07)", "--chipon": "rgba(255,255,255,.16)", "--tape": "repeating-linear-gradient(45deg,rgba(240,180,112,.75) 0 5px,rgba(240,180,112,.45) 5px 10px)", "--tbbg": "#1F1E2D", "--tbtx": "rgba(236,229,244,.55)", "--tbon": "#F0B470"}, "cherry": {"--sgbg": "#FFE3EA", "--sgon": "#EC7A97", "--sgtx": "#fff", "--sgoff": "#C2899A", "--pp": "#FFFCFD", "--pl": "#F6DAE2", "--pm": "rgba(236,122,151,.45)", "--hole": "#F2F4F6", "--ink": "#4E3640", "--ink2": "#B98D9A", "--hl": "#E05F80", "--chip": "#FFF0F3", "--chipon": "#fff", "--tape": "repeating-linear-gradient(90deg,#F7B3C4 0 6px,#FBD3DD 6px 12px)", "--tbbg": "#fff", "--tbtx": "#C2899A", "--tbon": "#E05F80"}, "forest": {"--sgbg": "#634630", "--sgsh": "inset 0 -2px 0 #4A3322", "--sgon": "#F4E2BC", "--sgtx": "#4A3020", "--sgoff": "#E8D3AE", "--pp": "#FCF6EA", "--pl": "#E9DAB9", "--pm": "rgba(196,106,78,.45)", "--hole": "#F2F4F6", "--ink": "#4A3624", "--ink2": "#A48B6E", "--hl": "#B8662F", "--chip": "#F3E7CF", "--chipon": "#FFFBF2", "--tape": "repeating-linear-gradient(90deg,#8DB37A 0 6px,#A9C796 6px 12px)", "--tbbg": "#634630", "--tbtx": "rgba(246,230,200,.65)", "--tbon": "#FFD27A"}, "sea": {"--sgbg": "#DDF2FA", "--sgon": "#2F86C4", "--sgtx": "#fff", "--sgoff": "#4C7A98", "--pp": "#FDFEFF", "--pl": "#D8ECF5", "--pm": "rgba(240,149,126,.5)", "--hole": "#F2F4F6", "--ink": "#1F3D55", "--ink2": "#86A4B8", "--hl": "#1F6FAE", "--chip": "#EAF6FB", "--chipon": "#fff", "--tape": "repeating-linear-gradient(90deg,#7CC4EA 0 4px,#fff 4px 8px)", "--tbbg": "#fff", "--tbtx": "#86A4B8", "--tbon": "#1F6FAE"}, "snow": {"--sgbg": "#27304D", "--sgon": "#F7FAFF", "--sgtx": "#1F2A44", "--sgoff": "rgba(232,238,248,.6)", "--pp": "#262F4A", "--pl": "rgba(255,255,255,.075)", "--pm": "rgba(232,93,93,.45)", "--hole": "#F2F4F6", "--ink": "#E8EEF8", "--ink2": "rgba(232,238,248,.5)", "--hl": "#A9C8F0", "--chip": "rgba(255,255,255,.07)", "--chipon": "rgba(255,255,255,.18)", "--tape": "repeating-linear-gradient(45deg,#E85D5D 0 5px,#F7FAFF 5px 10px)", "--tbbg": "#1B2238", "--tbtx": "rgba(232,238,248,.55)", "--tbon": "#fff"}, "train": {"--sgbg": "#E3EEF5", "--sgon": "#3E7FA8", "--sgtx": "#fff", "--sgoff": "#5E7E96", "--pp": "#FFFDF9", "--pl": "#E9E2D6", "--pm": "rgba(62,127,168,.4)", "--hole": "#F2F4F6", "--ink": "#2A3B4A", "--ink2": "#93A0AC", "--hl": "#3E7FA8", "--chip": "#EEF4F8", "--chipon": "#fff", "--tape": "repeating-linear-gradient(90deg,#9FC6DE 0 6px,#fff 6px 12px)", "--tbbg": "#fff", "--tbtx": "#93A0AC", "--tbon": "#3E7FA8"}, "orb": {"--sgbg": "rgba(27,26,25,.06)", "--sgon": "#1B1A19", "--sgtx": "#F4EFE7", "--sgoff": "#8C8378", "--pp": "#FBF8F3", "--pl": "rgba(27,26,25,.08)", "--pm": "rgba(233,138,110,.45)", "--hole": "#F2F4F6", "--ink": "#1B1A19", "--ink2": "#8C8378", "--hl": "#E98A6E", "--chip": "rgba(27,26,25,.05)", "--chipon": "#fff", "--tape": "repeating-linear-gradient(90deg,#F7B37A 0 6px,#FFE6B8 6px 12px)", "--tbbg": "#1B1A19", "--tbtx": "rgba(244,239,231,.55)", "--tbon": "#F7B37A"}};
+const SV = (w, h, b) => `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${b}</svg>`;
+const DSTK={
+lofi:{img:'v2',cap:'비 오는 밤 공부방',s:[
+ [SV(48,48,vinyl(24,24,22)),'right:22px;top:262px;transform:rotate(-8deg)'],
+ [SV(40,44,`<path d="M10 4q-3 4 0 7t0 7M18 4q-3 4 0 7t0 7" stroke="#C9C4DD" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/><rect x="4" y="18" width="24" height="22" rx="5" fill="#E9A766"/><path d="M28 23h3a5 5 0 0 1 0 10h-3" fill="none" stroke="#E9A766" stroke-width="3.5"/><rect x="4" y="18" width="24" height="5" rx="2" fill="#F4C48E"/>`),'right:92px;top:300px;transform:rotate(6deg)'],
+ [SV(30,30,`<path d="M20 3a12 12 0 1 0 7 20A10 10 0 0 1 20 3z" fill="#F7E2C0"/><circle cx="8" cy="7" r="1.4" fill="#F7E2C0"/><circle cx="25" cy="6" r="1" fill="#F7E2C0"/>`),'left:44px;top:328px;transform:rotate(-10deg)']]},
+cherry:{img:'cherry',cap:'벚꽃 봄 공부방',s:[
+ [SV(52,46,flower(16,18,14)+flower(36,26,11)+flower(22,36,8)),'right:18px;top:256px;transform:rotate(-6deg)'],
+ [SV(34,30,`<path d="M17 28C4 19 1 12 4 7s10-5 13 1c3-6 10-6 13-1s0 12-13 21z" fill="#F08FA8"/><circle cx="10" cy="10" r="2.5" fill="#fff" opacity=".6"/>`),'right:100px;top:304px;transform:rotate(10deg)'],
+ [SV(26,26,flower(13,13,12,'#FBC7D4','#F08FA8')),'left:44px;top:330px;transform:rotate(-10deg)']]},
+forest:{img:'forest',cap:'숲속 오두막',s:[
+ [SV(40,56,`<path d="M20 2V10" stroke="#3A2A1E" stroke-width="1.6"/><rect x="10" y="10" width="20" height="5" rx="1.5" fill="#3A2A1E"/><rect x="12" y="15" width="16" height="26" rx="2.5" fill="#FFCB6B"/><circle cx="20" cy="28" r="6" fill="#FFF0B8"/><path d="M12 15h16v26H12zM20 15v26" fill="none" stroke="#3A2A1E" stroke-width="1.8"/><rect x="9" y="41" width="22" height="5" rx="1.5" fill="#3A2A1E"/>`),'right:26px;top:254px;transform:rotate(-6deg)'],
+ [SV(40,40,`<rect x="16" y="20" width="9" height="16" rx="3" fill="#F3E6CC"/><path d="M3 22a17 15 0 0 1 34 0z" fill="#D9584A"/><circle cx="12" cy="13" r="2.6" fill="#fff"/><circle cx="23" cy="9" r="2.2" fill="#fff"/><circle cx="29" cy="17" r="2" fill="#fff"/>`),'right:100px;top:302px;transform:rotate(8deg)'],
+ [SV(30,36,pine(15,34,11,'#5F8A4E')),'left:44px;top:322px;transform:rotate(-8deg)']]},
+sea:{img:'sea',cap:'바닷가 공부방',s:[
+ [SV(48,48,(()=>{let d='';for(let k=0;k<5;k++){const a=(k*72-90)*Math.PI/180,b=((k*72-54))*Math.PI/180;d+=`${k?'L':'M'}${(24+Math.cos(a)*22).toFixed(1)} ${(26+Math.sin(a)*22).toFixed(1)}L${(24+Math.cos(b)*9).toFixed(1)} ${(26+Math.sin(b)*9).toFixed(1)}`}return `<path d="${d}z" fill="#F4A261" stroke="#F4A261" stroke-width="5" stroke-linejoin="round"/><circle cx="24" cy="18" r="1.6" fill="#fff" opacity=".7"/><circle cx="18" cy="27" r="1.4" fill="#fff" opacity=".7"/><circle cx="30" cy="27" r="1.4" fill="#fff" opacity=".7"/>`})()),'right:22px;top:256px;transform:rotate(-10deg)'],
+ [SV(42,38,`<path d="M21 34L4 14a17 17 0 0 1 34 0z" fill="#FBD5C6"/><path d="M21 34L11 8M21 34L21 4M21 34L31 8M21 34L5 15M21 34L37 15" stroke="#E8A48C" stroke-width="1.3"/><rect x="16" y="32" width="10" height="5" rx="2" fill="#E8A48C"/>`),'right:100px;top:304px;transform:rotate(8deg)'],
+ [SV(38,20,`<path d="M2 14q5-9 10 0t10 0t10 0" stroke="#4FA6DA" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M6 6q4-5 8 0" stroke="#7CC4EA" stroke-width="2.4" fill="none" stroke-linecap="round"/>`),'left:44px;top:330px;transform:rotate(-6deg)']]},
+snow:{img:'snow',cap:'눈 오는 밤',s:[
+ [SV(40,52,`<circle cx="20" cy="38" r="13" fill="#F7FAFF"/><circle cx="20" cy="17" r="9" fill="#F7FAFF"/><path d="M11 23h18v5H11z" fill="#E85D5D"/><path d="M24 26v9" stroke="#E85D5D" stroke-width="4"/><circle cx="17" cy="15" r="1.3" fill="#1F2A44"/><circle cx="23" cy="15" r="1.3" fill="#1F2A44"/><path d="M20 18l5 1.5-5 1z" fill="#F4A261"/><rect x="12" y="3" width="16" height="6" rx="2" fill="#1F2A44"/><rect x="9" y="8" width="22" height="3" rx="1.5" fill="#1F2A44"/>`),'right:26px;top:252px;transform:rotate(-6deg)'],
+ [SV(36,36,`<g stroke="#A9C8F0" stroke-width="2.4" stroke-linecap="round">${[0,60,120].map(a=>`<path d="M18 3V33M18 9l-4-4M18 9l4-4M18 27l-4 4M18 27l4 4" transform="rotate(${a} 18 18)"/>`).join('')}</g>`),'right:100px;top:304px;transform:rotate(10deg)'],
+ [SV(28,28,`<path d="M14 2l3.5 7.6 8.3.9-6.2 5.6 1.8 8.2L14 20l-7.4 4.3 1.8-8.2L2.2 10.5l8.3-.9z" fill="#F0CE7A"/>`),'left:44px;top:330px;transform:rotate(-10deg)']]}
+};
+const STICKERS = Object.values(DSTK).flatMap(o => o.s.map(x => x[0]));
+const TAPES = [...new Set(Object.values(DV).map(v => v['--tape']))];
+function plVars(el) { const th = TM[curTheme().k] || TM.lofi; for (const k in th.v) el.style.setProperty(k, th.v[k]); const dv = DV[curTheme().k] || DV.lofi; for (const k in dv) el.style.setProperty(k, dv[k]); el.classList.toggle('plgrain', !!th.grain); return th; }
 const plSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${inner}</svg>`;
 function plDeco(el, fn, cls) { if (!el) return; const r = el.getBoundingClientRect(); W = Math.round(r.width) || 336; const h = Math.round(r.height) || 88; el.insertAdjacentHTML('afterbegin', plSvg(W, h, fn(h), cls || 'pbg')); }
 
@@ -330,6 +356,7 @@ function plDeco(el, fn, cls) { if (!el) return; const r = el.getBoundingClientRe
 function plansOf(k) { return (D.plans[k] = D.plans[k] || []); }
 function cleanPlans(k) { if (D.plans[k]) { D.plans[k] = D.plans[k].filter(p => p.todos.length); if (!D.plans[k].length) delete D.plans[k]; } }
 function renderDay() {
+  if (R.dmode === 'diary') return renderDiary();
   const k = R.day, dt = kdate(k), dd = selDday();
   const sun = addDays(dt, -dt.getDay());
   const P = (D.plans[k] || []).filter(p => sub(p.sid)).sort((a, b) => { const ra = planRange(a), rb = planRange(b); return (ra ? toMin(ra.slice(0, 5)) : 2000) - (rb ? toMin(rb.slice(0, 5)) : 2000); });
@@ -342,6 +369,7 @@ function renderDay() {
       <div class="q tap" data-act="vow"><small>오늘의 다짐</small><p class="${vow && vow.text ? '' : 'ph'}">${vow && vow.text ? esc(vow.text) : '한 줄 다짐을 적어보세요'}</p></div>
       <div class="tm"><small>공부시간</small><b class="num" id="dayT">${hm(studiedSec(k))}<span> / ${gm ? Math.round(gm / 6) / 10 + 'h' : '-'}</span></b></div>
     </div></div>
+    ${segHtml()}
     <div class="card dmain">
       <div class="todo"><div class="h">할 일<span class="num">${done} / ${all}</span></div>
         ${P.map(p => { const s = sub(p.sid), pi = D.plans[k].indexOf(p), rg = planRange(p); return `<div class="sub" style="--l:${s.l};--sc:${s.c}">
@@ -356,6 +384,94 @@ function renderDay() {
   drawTimetable(k);
   const th = plVars(screen.querySelector('.day'));
   plDeco(screen.querySelector('.phero'), th.hero); plDeco(screen.querySelector('.dmain'), th.body);
+}
+// =========================================================
+//  플래너 — 다이어리 (날짜별 저장)
+// =========================================================
+const segHtml = () => `<div class="pseg"><div class="tap${R.dmode === 'diary' ? '' : ' on'}" data-dmode="plan"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9"/></svg>플래너</div><div class="tap${R.dmode === 'diary' ? ' on' : ''}" data-dmode="diary"><svg viewBox="0 0 24 24"><path d="M6 3.5h10.5a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6zM6 3.5v17M9.5 8h5.5M9.5 11.5h5.5"/></svg>다이어리</div></div>`;
+const DW = ['☀️', '☁️', '🌧️'], DM = ['🙂', '😐', '😢'];
+const PENS = [['기본', ''], ['검정', '#2B2B2B'], ['파랑', '#2F6FB8'], ['빨강', '#D9534F'], ['초록', '#3E8E5E'], ['보라', '#7A5BC7']];
+const PAPERS = [['line', '줄노트'], ['grid', '모눈'], ['dot', '도트'], ['plain', '무지']];
+const DTOOLS = [['sticker', '스티커', '<path d="M5 4h10l4 4v12H5z"/><path d="M15 4v4h4"/><circle cx="10" cy="12" r="1"/><circle cx="14" cy="12" r="1"/><path d="M9.5 15.5q2.5 2 5 0"/>'],
+  ['tape', '테이프', '<rect x="3" y="8" width="18" height="8" rx="1" transform="rotate(-12 12 12)"/><path d="M8 7.5l1.7 8M14 6.3l1.7 8"/>'],
+  ['photo', '사진', '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 15l-5-4.5-8 8"/>'],
+  ['pen', '펜', '<path d="M15.5 4.5l4 4L9 19l-5 1 1-5z"/><path d="M13.5 6.5l4 4"/>'],
+  ['paper', '속지', '<path d="M4 20V6l8-3 8 3v14"/><path d="M4 10h16M4 15h16"/>']];
+let dTool = 'sticker';
+function diaryOf(k, make) { D.diary = D.diary || {}; if (!D.diary[k] && make) D.diary[k] = { text: '', w: null, m: null, pen: '', paper: 'line', items: [] }; return D.diary[k]; }
+function cleanDiary(k) { const d = D.diary && D.diary[k]; if (d && !d.text && d.w == null && d.m == null && !d.pen && d.paper === 'line' && !d.items.length) delete D.diary[k]; }
+function saveDiary(k) { cleanDiary(k); try { localStorage.setItem(KEY, JSON.stringify(D)); return true; } catch (e) { return false; } }
+function dItemHtml(it, i) {
+  const st = `left:${(it.x * 100).toFixed(2)}%;top:${(it.y * 100).toFixed(2)}%;transform:translate(-50%,-50%) rotate(${it.r}deg)`;
+  if (it.t === 's') return `<div class="dit dstk" data-i="${i}" style="${st}">${STICKERS[it.i] || ''}</div>`;
+  if (it.t === 't') return `<div class="dit dtape" data-i="${i}" style="${st};background:${TAPES[it.i] || TAPES[0]}"></div>`;
+  return `<div class="dit dpol" data-i="${i}" style="${st}"><img src="${it.src}" alt=""><small>${esc(it.cap || '')}</small></div>`;
+}
+function renderDiary() {
+  const k = R.day, dt = kdate(k), d = diaryOf(k) || { text: '', w: null, m: null, pen: '', paper: 'line', items: [] };
+  const ttl = k === todayKey() ? '오늘의 일기' : `${dt.getMonth() + 1}월 ${dt.getDate()}일의 일기`;
+  screen.innerHTML = `<div class="scroll day dmode" style="overflow:hidden"><div class="wrap">
+    ${segHtml()}
+    <div class="card diary pp-${d.paper || 'line'}" id="dc">
+      <div class="lines"></div><div class="mg"></div><div class="holes">${'<i></i>'.repeat(6)}</div>
+      <div class="dyh"><b>${ttl}</b><div class="ic" data-g="w">${DW.map((x, i) => `<span class="tap${d.w === i ? ' on' : ''}" data-v="${i}">${x}</span>`).join('')}</div><div class="ic" data-g="m">${DM.map((x, i) => `<span class="tap${d.m === i ? ' on' : ''}" data-v="${i}">${x}</span>`).join('')}</div></div>
+      <textarea class="dtxt" id="dta" spellcheck="false" style="${d.pen ? 'color:' + d.pen : ''}">${esc(d.text || '')}</textarea>
+      <div class="ditems" id="dit">${(d.items || []).map(dItemHtml).join('')}</div>
+      <div class="tb2">${DTOOLS.map(([id, n, p]) => `<div class="tap${dTool === id ? ' on' : ''}" data-tool="${id}"><svg viewBox="0 0 24 24">${p}</svg>${n}</div>`).join('')}</div>
+    </div></div></div>`;
+  plVars(screen.querySelector('.day'));
+  const dc = $('#dc'), ta = $('#dta');
+  ta.oninput = () => { diaryOf(k, 1).text = ta.value; saveDiary(k); };
+  dc.querySelectorAll('.ic').forEach(g => g.onclick = e => { const sp = e.target.closest('span'); if (!sp) return; const dd = diaryOf(k, 1), key = g.dataset.g, v = +sp.dataset.v; dd[key] = dd[key] === v ? null : v; saveDiary(k); g.querySelectorAll('span').forEach(x => x.classList.toggle('on', +x.dataset.v === dd[key])); });
+  dc.querySelector('.tb2').onclick = e => { const t = e.target.closest('[data-tool]'); if (!t) return; dTool = t.dataset.tool; dc.querySelectorAll('.tb2 > div').forEach(x => x.classList.toggle('on', x === t)); diaryTool(k, dTool); };
+  bindDiaryItems(k);
+}
+function addDiaryItem(k, it) {
+  const d = diaryOf(k, 1); it.x = it.x || (.3 + Math.random() * .4); it.y = it.y || (.3 + Math.random() * .35); it.r = it.r != null ? it.r : Math.round(Math.random() * 16 - 8);
+  d.items.push(it);
+  if (!saveDiary(k)) { d.items.pop(); saveDiary(k); toast('저장 공간이 부족해요'); return; }
+  renderDiary();
+}
+function bindDiaryItems(k) {
+  const dc = $('#dc');
+  dc.querySelectorAll('.dit').forEach(el => {
+    el.onpointerdown = e => {
+      e.preventDefault(); el.setPointerCapture(e.pointerId);
+      const r = dc.getBoundingClientRect(), it = diaryOf(k, 1).items[+el.dataset.i];
+      const sx = e.clientX, sy = e.clientY, ox = it.x, oy = it.y; let moved = false;
+      el.onpointermove = ev => { const dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) > 6) moved = true; if (!moved) return;
+        it.x = Math.min(.97, Math.max(.03, ox + dx / r.width)); it.y = Math.min(.97, Math.max(.03, oy + dy / r.height)); el.style.left = (it.x * 100) + '%'; el.style.top = (it.y * 100) + '%'; };
+      el.onpointerup = el.onpointercancel = () => { el.onpointermove = el.onpointerup = el.onpointercancel = null;
+        if (moved) { saveDiary(k); return; }
+        const nm = it.t === 's' ? '스티커' : it.t === 't' ? '테이프' : '사진';
+        askConfirm(nm + '를 삭제하시겠습니까?', '', () => { const d = diaryOf(k, 1); d.items.splice(d.items.indexOf(it), 1); saveDiary(k); renderDiary(); }); };
+    };
+  });
+}
+function diaryTool(k, tool) {
+  if (tool === 'sticker') {
+    const w = openSheet(`${title('스티커')}<div class="ss">눌러서 붙이고, 끌어서 옮길 수 있어요</div><div class="dgrid">${STICKERS.map((x, i) => `<span class="tap" data-i="${i}">${x}</span>`).join('')}</div>`);
+    w.querySelector('.dgrid').onclick = e => { const sp = e.target.closest('[data-i]'); if (!sp) return; closeSheet(); addDiaryItem(k, { t: 's', i: +sp.dataset.i }); };
+  } else if (tool === 'tape') {
+    const w = openSheet(`${title('마스킹 테이프')}<div class="ss">눌러서 붙이고, 끌어서 옮길 수 있어요</div><div class="dtapes">${TAPES.map((x, i) => `<span class="tap" data-i="${i}" style="background:${x}"></span>`).join('')}</div>`);
+    w.querySelector('.dtapes').onclick = e => { const sp = e.target.closest('[data-i]'); if (!sp) return; closeSheet(); addDiaryItem(k, { t: 't', i: +sp.dataset.i }); };
+  } else if (tool === 'photo') {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => { const f = inp.files && inp.files[0]; if (!f) return; const fr = new FileReader();
+      fr.onload = () => { const img = new Image(); img.onload = () => { const M = 420, sc = Math.min(1, M / Math.max(img.width, img.height)); const cv = document.createElement('canvas'); cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        const dt = kdate(k); addDiaryItem(k, { t: 'p', src: cv.toDataURL('image/jpeg', .72), cap: `${dt.getMonth() + 1}.${dt.getDate()}` }); }; img.src = fr.result; };
+      fr.readAsDataURL(f); };
+    inp.click();
+  } else if (tool === 'pen') {
+    const d = diaryOf(k) || {};
+    const w = openSheet(`${title('펜 색')}<div class="ss">일기 글씨 색을 골라요</div><div class="dpens">${PENS.map(([n, c]) => `<span class="tap${(d.pen || '') === c ? ' on' : ''}" data-c="${c}"><i style="background:${c || 'var(--ink)'}"></i>${n}</span>`).join('')}</div>`);
+    plVars(w.querySelector('.sh'));
+    w.querySelector('.dpens').onclick = e => { const sp = e.target.closest('[data-c]'); if (!sp) return; diaryOf(k, 1).pen = sp.dataset.c; saveDiary(k); closeSheet(); renderDiary(); };
+  } else if (tool === 'paper') {
+    const d = diaryOf(k) || {};
+    const w = openSheet(`${title('속지')}<div class="ss">일기장 속지를 바꿔요</div><div class="dpaps">${PAPERS.map(([id, n]) => `<span class="tap${(d.paper || 'line') === id ? ' on' : ''}" data-p="${id}"><i class="pp-${id}"></i>${n}</span>`).join('')}</div>`);
+    w.querySelector('.dpaps').onclick = e => { const sp = e.target.closest('[data-p]'); if (!sp) return; diaryOf(k, 1).paper = sp.dataset.p; saveDiary(k); closeSheet(); renderDiary(); };
+  }
 }
 function drawTimetable(k) {
   const base = kdate(k).getTime() + 6 * 3600e3; // 6시부터 19시간(6~0시)
@@ -448,6 +564,8 @@ function renderSoon() {
 // =========================================================
 function toggleTodo(tid) { const f = findTodo(tid); if (!f) return; f.t.done = !f.t.done; save(); }
 screen.addEventListener('click', e => {
+  const dm = e.target.closest('[data-dmode]');
+  if (dm) { if (R.dmode !== dm.dataset.dmode) { R.dmode = dm.dataset.dmode; render(); } return; }
   const cb = e.target.closest('[data-cat]');
   if (cb) { R.shopCat = cb.dataset.cat; render(); screen.querySelector('.scroll') && (screen.querySelector('.scroll').scrollTop = 0); return; }
   const tb = e.target.closest('[data-theme]');
@@ -463,7 +581,7 @@ screen.addEventListener('click', e => {
     else if (a === 'subjects') sheetSubjects();
     else if (a === 'newsub') sheetSubjectEdit(null);
     else if (a === 'today') openDay(todayKey());
-    else if (a === 'back') { R.day = null; render(); }
+    else if (a === 'back') { R.day = null; R.dmode = 'plan'; render(); }
     else if (a === 'shopback') { R.shopCat = null; render(); }
     else if (a === 'vow') sheetVow();
     else if (a === 'addplan') sheetTodo(null);
@@ -712,7 +830,7 @@ function sheetProfile() {
     <div class="srow"><b>지금까지 공부한 시간</b><span class="num">${kdur(total / 60)}</span></div>
     <div class="srow"><b>연속 공부</b><span>${streak()}일</span></div>
     <div class="srow tap" id="psub"><b>테마 관리</b><span>${D.subjects.length}개</span>${PEN}</div>
-    <div class="srow"><b>앱 버전</b><span>0.1.13</span></div>
+    <div class="srow"><b>앱 버전</b><span>0.1.14</span></div>
     <div style="height:10px"></div>
     <div class="btns"><div class="btn red tap" id="reset" style="flex:1">기록 초기화</div><div class="btn tap" data-close>닫기</div></div>`);
   w.querySelector('#psub').onclick = () => sheetSubjects();
@@ -734,6 +852,7 @@ function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('o
 // ---------- 뒤로가기 (안드로이드 버튼) ----------
 window.appBack = function () {
   if (closeSheet()) return true;
+  if (R.tab === 'planner' && R.day && R.dmode === 'diary') { R.dmode = 'plan'; render(); return true; }
   if (R.tab === 'planner' && R.day) { R.day = null; render(); return true; }
   if (R.tab === 'shop' && R.shopCat) { R.shopCat = null; render(); return true; }
   if (R.tab !== 'home') { go('home'); return true; }

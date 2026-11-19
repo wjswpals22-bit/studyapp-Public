@@ -508,3 +508,53 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .thimg{position:relative}
 .thimg u.new{position:absolute;left:10px;top:10px;text-decoration:none;font-size:10px;font-weight:800;color:#fff;background:#E5574A;border-radius:6px;padding:2px 6px;letter-spacing:.3px}
 .thb i.price{display:inline-block;font-style:normal;font-size:11.5px;font-weight:800;color:#1F2A44;background:#EEF1F6;border-radius:6px;padding:2px 7px;margin-top:6px}
+/* v0.1.14 플래너 | 다이어리 */
+.pseg{display:flex;padding:3px;border-radius:12px;background:var(--sgbg);margin-bottom:8px;box-shadow:var(--sgsh,none);flex:none}
+.pseg div{flex:1;text-align:center;font-size:13px;font-weight:650;line-height:30px;border-radius:9px;color:var(--sgoff);display:flex;align-items:center;justify-content:center;gap:5px}
+.pseg div.on{background:var(--sgon);color:var(--sgtx);box-shadow:0 2px 6px -2px rgba(0,0,0,.25)}
+.pseg svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dmode .pseg{margin-top:12px}
+.day .card.diary{padding:0!important;position:relative;overflow:hidden;isolation:isolate;border-radius:22px;background:var(--pp);color:var(--ink);box-shadow:var(--sh,none);flex:1;min-height:0;margin-bottom:12px}
+.diary .lines{position:absolute;left:0;right:0;top:46px;bottom:0;z-index:0;background:repeating-linear-gradient(to bottom,transparent 0 25px,var(--pl) 25px 26px)}
+.diary.pp-grid .lines{background:repeating-linear-gradient(to bottom,transparent 0 12px,var(--pl) 12px 13px),repeating-linear-gradient(to right,transparent 0 12px,var(--pl) 12px 13px)}
+.diary.pp-dot .lines{background:radial-gradient(circle,var(--pl) 0 1.3px,transparent 1.6px) 0 0/13px 13px}
+.diary.pp-dot .lines{filter:contrast(1.4)}
+.diary.pp-plain .lines{background:none}
+.diary .mg{position:absolute;top:0;bottom:0;left:34px;width:1px;background:var(--pm);z-index:0;opacity:.8}
+.diary.pp-plain .mg{display:none}
+.diary .holes{position:absolute;left:12px;top:56px;bottom:60px;z-index:1;display:flex;flex-direction:column;justify-content:space-between}
+.diary .holes i{width:9px;height:9px;border-radius:50%;background:var(--hole);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+.dyh{position:relative;z-index:2;height:46px;display:flex;align-items:center;padding:0 14px 0 46px;gap:8px}
+.dyh b{font-size:15px;font-weight:700;flex:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dyh .ic{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--chip);flex:none}
+.dyh .ic span{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;opacity:.6}
+.dyh .ic span.on{opacity:1;background:var(--chipon);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.diary .dtxt{position:absolute;z-index:2;left:46px;right:14px;top:46px;bottom:70px;padding:4px 0 0;border:0;outline:0;resize:none;background:transparent;font:inherit;font-size:13.5px;font-weight:500;line-height:26px;letter-spacing:-.4px;color:var(--ink);caret-color:var(--hl);-webkit-appearance:none}
+.diary .dtxt{padding-top:3px}
+.ditems{position:absolute;inset:0;z-index:4;pointer-events:none}
+.dit{position:absolute;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.dstk{filter:drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff) drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff) drop-shadow(0 3px 4px rgba(0,0,0,.22))}
+.dstk svg{display:block}
+.dtape{width:64px;height:16px;opacity:.88;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.dpol{width:112px;padding:6px 6px 20px;background:#fff;box-shadow:0 6px 14px -6px rgba(0,0,0,.35)}
+.dpol img{display:block;width:100%;height:76px;object-fit:cover;pointer-events:none}
+.dpol small{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:9.5px;color:#6B7684;font-weight:600}
+.diary .tb2{position:absolute;z-index:6;left:12px;right:12px;bottom:12px;height:50px;border-radius:16px;background:var(--tbbg);display:flex;align-items:center;padding:0 4px;box-shadow:0 8px 20px -10px rgba(0,0,0,.45)}
+.diary .tb2 div{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9.5px;font-weight:600;color:var(--tbtx)}
+.diary .tb2 div.on{color:var(--tbon)}
+.diary .tb2 svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.plgrain .diary:after{content:"";position:absolute;inset:0;z-index:9;pointer-events:none;border-radius:inherit;opacity:var(--grain,.14);mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+.dgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:4px 0 18px}
+.dgrid span{height:62px;border-radius:14px;background:#F2F4F6;display:flex;align-items:center;justify-content:center}
+.dgrid svg{max-width:46px;max-height:46px}
+.dtapes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:6px 0 20px}
+.dtapes span{height:26px;border-radius:3px;opacity:.9;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.dpens,.dpaps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 0 18px}
+.dpaps{grid-template-columns:repeat(4,1fr)}
+.dpens span,.dpaps span{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0 10px;border-radius:14px;background:#F2F4F6;font-size:12.5px;font-weight:600;color:#4E5968}
+.dpens span.on,.dpaps span.on{box-shadow:inset 0 0 0 2px #1F2A44;color:#191F28}
+.dpens i{width:24px;height:24px;border-radius:50%}
+.dpaps i{width:40px;height:48px;border-radius:5px;background-color:#fff;box-shadow:0 0 0 1px #E5E8EB;--pl:#D5DAE0}
+.dpaps i.pp-line{background-image:repeating-linear-gradient(to bottom,transparent 0 7px,var(--pl) 7px 8px)}
+.dpaps i.pp-grid{background-image:repeating-linear-gradient(to bottom,transparent 0 6px,var(--pl) 6px 7px),repeating-linear-gradient(to right,transparent 0 6px,var(--pl) 6px 7px)}
+.dpaps i.pp-dot{background-image:radial-gradient(circle,#B0B8C1 0 1px,transparent 1.3px);background-size:7px 7px}
